@@ -1,0 +1,848 @@
+<title>תג אחד על השולחן 2</title>
+<meta name="description" content="גרסה 2 של התוכנית העסקית של אדם לתגי NFC ממותגים לבתי קפה ומסעדות עצמאיים: שוק אמיתי, מתחרים, ערך בלעדי, תמחור לפי שולחנות, ייצור, בלאי ונקודות איזון.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700;900&family=Assistant:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EEF1EC; --paper:#FFFFFF; --ink:#16241E; --muted:#56655D;
+  --green:#1F4D3A; --green-2:#2E6B52; --mustard:#D99A1E; --mustard-ink:#8A5E08; --mustard-soft:#F6E7C4;
+  --line:#CBD4CC; --red:#A63D2F; --red-soft:#F5E1DD; --green-soft:#DCEBE2;
+  --hero-bg:#1F4D3A; --hero-ink:#F4F7F3; --hero-muted:#C9D8CE;
+  --serif:"Frank Ruhl Libre","David Libre",Georgia,serif;
+  --sans:"Assistant","Heebo","Segoe UI",Arial,sans-serif;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#101915; --paper:#17231D; --ink:#E7EEE9; --muted:#9DB0A5;
+    --green:#7FC3A1; --green-2:#6DBB94; --mustard:#E8B24A; --mustard-ink:#E8B24A; --mustard-soft:#3A3120;
+    --line:#2C3C34; --red:#E07A6A; --red-soft:#3A2420; --green-soft:#1D3328;
+    --hero-bg:#0B130F; --hero-ink:#E7EEE9; --hero-muted:#9DB0A5;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#101915; --paper:#17231D; --ink:#E7EEE9; --muted:#9DB0A5;
+  --green:#7FC3A1; --green-2:#6DBB94; --mustard:#E8B24A; --mustard-ink:#E8B24A; --mustard-soft:#3A3120;
+  --line:#2C3C34; --red:#E07A6A; --red-soft:#3A2420; --green-soft:#1D3328;
+  --hero-bg:#0B130F; --hero-ink:#E7EEE9; --hero-muted:#9DB0A5;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500;
+}
+:root{direction:rtl}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:18px;line-height:1.7;-webkit-font-smoothing:antialiased}
+a{color:var(--green-2)}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--mustard);outline-offset:2px}
+code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.88em;direction:ltr;unicode-bidi:isolate}
+
+/* hero */
+.hero{background:var(--hero-bg);color:var(--hero-ink);padding-block:48px 56px;padding-inline:20px}
+.hero-inner{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:1.3fr .7fr;gap:36px;align-items:center}
+.ver{display:inline-block;font-weight:700;font-size:.85rem;letter-spacing:.06em;border:1.5px solid var(--mustard);color:var(--mustard);padding:2px 10px;margin-bottom:14px}
+.hero h1{font-family:var(--serif);font-weight:900;font-size:clamp(2.4rem,6.5vw,4.6rem);line-height:1.04;margin:0 0 16px;text-wrap:balance}
+.hero p.lead{font-size:1.18rem;max-width:34em;margin:0 0 18px;color:var(--hero-muted)}
+.hero .meta{font-size:.93rem;color:var(--hero-muted)}
+.rings{width:100%;max-width:300px;justify-self:center}
+.rings .r{fill:none;stroke:#D99A1E;stroke-width:2;opacity:0;transform-origin:180px 190px;animation:ring 3.2s ease-out infinite}
+.rings .r2{animation-delay:.8s}.rings .r3{animation-delay:1.6s}
+@keyframes ring{0%{opacity:.9;transform:scale(.35)}100%{opacity:0;transform:scale(1.15)}}
+@media (prefers-reduced-motion: reduce){.rings .r{animation:none;opacity:.5}.rings .r2{transform:scale(.7)}.rings .r3{transform:scale(1)}}
+
+/* layout */
+.wrap{max-width:1080px;margin:0 auto;padding-inline:20px;display:grid;grid-template-columns:220px minmax(0,1fr);gap:44px}
+nav.toc{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);align-self:start;padding-top:36px;font-size:.93rem;max-height:calc(100vh - 32px);overflow:auto}
+nav.toc ol{list-style:none;margin:0;padding:0;counter-reset:t}
+nav.toc li{counter-increment:t;margin:0 0 5px}
+nav.toc a{color:var(--muted);text-decoration:none;display:flex;gap:8px}
+nav.toc a::before{content:counter(t);font-family:var(--serif);color:var(--mustard-ink);min-width:1.4em}
+nav.toc a:hover{color:var(--ink)}
+main{padding-block:36px 80px;min-width:0}
+section{margin:0 0 60px;scroll-margin-top:16px}
+h2{font-family:var(--serif);font-size:clamp(1.7rem,3.8vw,2.35rem);line-height:1.18;margin:0 0 16px;text-wrap:balance}
+h2 .n{color:var(--mustard-ink);font-weight:700;margin-inline-end:.35em}
+h3{font-family:var(--serif);font-size:1.3rem;line-height:1.3;margin:30px 0 10px;text-wrap:balance}
+p{margin:0 0 14px;max-width:44em}
+ul,ol{max-width:44em;padding-inline-start:1.3em;margin:0 0 16px}
+li{margin:0 0 6px}
+strong{font-weight:700}
+.small{font-size:.9rem;color:var(--muted)}
+
+/* evidence chips */
+.k{display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:.04em;line-height:1;padding:4px 7px 3px;border:1.5px solid;vertical-align:.12em;margin-inline:4px 0;white-space:nowrap}
+.k.v{color:var(--green-2);border-color:var(--green-2)}
+.k.e{color:var(--mustard-ink);border-color:var(--mustard);border-style:dashed}
+.k.h{color:var(--red);border-color:var(--red);border-style:dotted}
+.legend{display:flex;flex-wrap:wrap;gap:10px 22px;font-size:.9rem;color:var(--muted);margin:10px 0 0}
+.legend span{display:flex;align-items:center;gap:6px;white-space:nowrap}
+.hero .legend{color:var(--hero-muted)}
+.hero .k.v{color:#A8DCC0;border-color:#A8DCC0}
+.hero .k.e{color:#F0C46A;border-color:#F0C46A}
+.hero .k.h{color:#F2A99B;border-color:#F2A99B}
+
+.bottom-line{background:var(--paper);border-inline-start:6px solid var(--mustard);padding:24px 26px;margin:0 0 48px;box-shadow:0 1px 0 var(--line)}
+.bottom-line h2{font-size:1.6rem;margin-bottom:12px}
+.bottom-line p:last-child{margin:0}
+.verdict{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:baseline;margin:0 0 12px}
+.verdict b{font-family:var(--serif);font-size:1.45rem;color:var(--green-2)}
+
+.note{background:var(--mustard-soft);padding:14px 18px;margin:18px 0;max-width:44em;font-size:.97rem}
+.warn{border-inline-start:4px solid var(--red);background:var(--paper);padding:14px 18px;margin:18px 0;max-width:44em;font-size:.97rem}
+.quote{font-family:var(--serif);font-size:1.35rem;line-height:1.5;background:var(--paper);border-inline-start:6px solid var(--green-2);padding:20px 24px;margin:18px 0;max-width:40em}
+.quote small{display:block;font-family:var(--sans);font-size:.9rem;color:var(--muted);margin-top:8px}
+
+.table-wrap{overflow-x:auto;margin:10px 0 20px;border:1px solid var(--line);background:var(--paper)}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:.94rem}
+th,td{text-align:right;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:700;background:color-mix(in srgb,var(--green) 10%,var(--paper))}
+tr:last-child td{border-bottom:0}
+td.num,th.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+td.pick{font-weight:700;color:var(--green-2)}
+tr.hl td{background:color-mix(in srgb,var(--mustard) 12%,var(--paper))}
+
+/* funnel */
+.funnel{display:grid;gap:8px;margin:18px 0 8px;max-width:44em}
+.fstep{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;align-items:center}
+.fbar{height:14px;background:color-mix(in srgb,var(--green-2) 22%,var(--paper));border-inline-start:4px solid var(--green-2);grid-column:1 / -1;max-width:100%}
+.fstep.target .fbar{background:color-mix(in srgb,var(--mustard) 35%,var(--paper));border-color:var(--mustard)}
+.flabel{font-size:.95rem}
+.fnum{font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap}
+
+/* value flow */
+.flow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);margin:18px 0}
+.flow>div{background:var(--paper);padding:16px 18px}
+.flow h4{margin:0 0 6px;font-size:1.02rem}
+.flow p{margin:0;font-size:.94rem;color:var(--muted)}
+.phone{max-width:320px;margin:18px 0;background:var(--paper);border:1px solid var(--line);padding:16px}
+.phone .brand{font-family:var(--serif);font-weight:700;font-size:1.2rem;margin-bottom:10px}
+.phone .btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.phone .btns span{display:block;text-align:center;padding:12px 6px;border:1.5px solid var(--green-2);font-weight:700;font-size:.95rem}
+.phone .btns span.live{background:var(--green-2);color:var(--paper)}
+.phone .foot{font-size:.8rem;color:var(--muted);margin-top:10px}
+.board{max-width:420px;margin:18px 0;background:var(--paper);border:1px solid var(--line);font-size:.95rem}
+.board div{display:grid;grid-template-columns:auto 1fr auto;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line);align-items:center}
+.board div:last-child{border-bottom:0}
+.board b{font-variant-numeric:tabular-nums}
+.pill{font-size:.75rem;font-weight:700;padding:3px 8px;border:1.5px solid}
+.pill.call{color:var(--green-2);border-color:var(--green-2)}
+.pill.issue{color:var(--red);border-color:var(--red)}
+.pill.done{color:var(--muted);border-color:var(--line)}
+
+/* calculators */
+.calc{background:var(--paper);border:1px solid var(--line);padding:22px;margin:20px 0}
+.calc h3{margin-top:0}
+.calc .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 18px;align-items:end}
+.calc label{display:block;font-size:.88rem;color:var(--muted);margin-bottom:4px;line-height:1.35}
+.calc input,.calc select{width:100%;font:inherit;font-size:1.02rem;padding:7px 10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font-variant-numeric:tabular-nums}
+.calc .out{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);margin-top:20px;border:1px solid var(--line)}
+.calc .out div{background:var(--bg);padding:14px}
+.calc .out b{display:block;font-family:var(--serif);font-size:1.45rem;line-height:1.2;color:var(--green-2)}
+.calc .out span{font-size:.84rem;color:var(--muted);display:block;line-height:1.35}
+.calc .foot{font-size:.85rem;color:var(--muted);margin:12px 0 0}
+.calc button{font:inherit;font-size:.9rem;padding:6px 12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer}
+
+/* chart */
+.chart{background:var(--paper);border:1px solid var(--line);padding:18px 18px 10px;margin:18px 0;position:relative}
+.chart h4{margin:0 0 2px;font-size:1.02rem}
+.chart .sub{font-size:.85rem;color:var(--muted);margin:0 0 8px}
+.chart svg{display:block;width:100%;height:auto}
+.chart .axis text{fill:var(--muted);font-size:12px;font-family:var(--sans)}
+.chart .axis line{stroke:var(--line);stroke-width:1}
+.chart .lbl{fill:var(--ink);font-size:12.5px;font-family:var(--sans)}
+.chart .lbl-m{fill:var(--muted);font-size:12px;font-family:var(--sans)}
+.chart .hit{fill:transparent;cursor:default}
+.chart .bar-lo{opacity:.35}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--paper);font-size:.85rem;padding:6px 10px;line-height:1.4;max-width:260px}
+.tip b{display:block;font-size:1rem}
+
+
+/* range / bar charts (HTML, logical properties so they read right-to-left) */
+.rb{display:grid;gap:2px}
+.rb-row{display:grid;grid-template-columns:minmax(110px,32%) minmax(0,1fr);gap:12px;align-items:center}
+.rb-name{font-size:.9rem;line-height:1.3}
+.rb-track{position:relative;height:36px;background:repeating-linear-gradient(to left,var(--line) 0 1px,transparent 1px 12.5%)}
+.rb-track.one{height:26px;background:repeating-linear-gradient(to left,var(--line) 0 1px,transparent 1px 25%)}
+.rb-bar{position:absolute;height:10px;border-radius:4px;min-width:4px;outline:none}
+.rb-bar:hover,.rb-bar:focus-visible{filter:brightness(1.12);box-shadow:0 0 0 2px var(--paper),0 0 0 4px var(--ink)}
+.rb-bar.a{top:6px;background:var(--s1)}
+.rb-bar.b{top:20px;background:var(--s2)}
+.rb-track.one .rb-bar{top:8px;background:var(--green-2)}
+.rb-track.one .rb-bar.hl{background:var(--mustard)}
+.rb-val{position:absolute;font-size:11.5px;line-height:1;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+.rb-track .rb-val.a{top:5px}.rb-track .rb-val.b{top:19px}
+.rb-track.one .rb-val{top:7px;color:var(--ink);font-size:12px}
+.rb-axis{display:grid;grid-template-columns:minmax(110px,32%) minmax(0,1fr);gap:12px;margin-top:4px}
+.rb-ticks{position:relative;height:18px}
+.rb-ticks span{position:absolute;top:0;white-space:nowrap;font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums;transform:translateX(50%)}
+.rb-ticks span.first{transform:none}
+.rb-ticks span.last{transform:translateX(100%)}
+@media (max-width:480px){.rb-row,.rb-axis{grid-template-columns:minmax(0,1fr)}.rb-axis>span:first-child{display:none}.rb-name{font-size:.85rem}}
+
+/* gates */
+.gates{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:18px 0}
+.gate{background:var(--paper);border:1px solid var(--line);padding:16px 18px}
+.gate h4{margin:0 0 4px;font-size:1.02rem}
+.gate .t{font-family:var(--serif);font-size:1.5rem;color:var(--green-2);line-height:1.2}
+.gate p{margin:6px 0 0;font-size:.92rem;color:var(--muted)}
+
+.phase{border-top:2px solid var(--green);padding-top:14px;margin:26px 0}
+.phase h3{margin-top:0}
+.phase .when{font-size:.9rem;color:var(--muted)}
+
+footer{border-top:1px solid var(--line);padding-block:24px 40px;color:var(--muted);font-size:.9rem}
+.src li{font-size:.86rem;color:var(--muted)}
+
+@media (max-width:900px){
+  .hero-inner{grid-template-columns:1fr}
+  .rings{max-width:180px;order:-1;justify-self:start}
+  .wrap{grid-template-columns:minmax(0,1fr);gap:0}
+  nav.toc{position:static;padding-top:24px;max-height:none}
+  nav.toc ol{columns:2;column-gap:20px}
+  .flow{grid-template-columns:1fr}
+  .calc .grid{grid-template-columns:1fr 1fr}
+  .calc .out{grid-template-columns:1fr 1fr}
+  .gates{grid-template-columns:1fr}
+}
+@media (max-width:480px){
+  body{font-size:17px}
+  .hero{padding-inline:16px}
+  .wrap{padding-inline:16px}
+  nav.toc ol{columns:1}
+  .calc{padding:16px}
+  .calc .grid{grid-template-columns:1fr 1fr;gap:12px}
+  .bottom-line{padding:18px}
+}
+</style>
+
+<div dir="rtl" lang="he">
+<header class="hero">
+  <div class="hero-inner">
+    <div>
+      <span class="ver">גרסה 2 · אחרי סבב הערות</span>
+      <h1>תג אחד על השולחן</h1>
+      <p class="lead">התוכנית של אדם, מחודדת: השוק האמיתי ולא מיליארדים, מי כבר מוכר את זה בישראל ובכמה, מה הערך שרק המוצר הזה נותן, כמה אפשר לגבות לפי מספר השולחנות, ומה קורה כשתגים נשברים, נגנבים או מתעקמים בשמש.</p>
+      <div class="meta">ספטמבר 2026 · נבנה על גרסה 1 של אדם · המחירים לפני מע״מ</div>
+      <div class="legend" aria-label="מקרא סימונים">
+        <span><i class="k v">מאומת</i> נבדק מול מקור</span>
+        <span><i class="k e">הערכה</i> חישוב או הנחה שלנו</span>
+        <span><i class="k h">לבדיקה</i> השערה שהפיילוט צריך לאשש</span>
+      </div>
+    </div>
+    <svg class="rings" viewBox="0 0 360 380" role="img" aria-label="איור: טלפון נוגע בסטנד NFC עם גלי אות">
+      <circle class="r r1" cx="180" cy="190" r="150"/>
+      <circle class="r r2" cx="180" cy="190" r="150"/>
+      <circle class="r r3" cx="180" cy="190" r="150"/>
+      <path d="M110 330 L180 150 L250 330 Z" fill="#F4F7F3" opacity=".95"/>
+      <path d="M180 150 L250 330 L240 330 L180 175 Z" fill="#C9D6CD"/>
+      <circle cx="180" cy="245" r="26" fill="none" stroke="#1F4D3A" stroke-width="4"/>
+      <path d="M170 237 q10 8 0 16 M178 231 q16 14 0 28 M186 225 q22 20 0 40" fill="none" stroke="#1F4D3A" stroke-width="3" stroke-linecap="round"/>
+      <rect x="196" y="60" width="74" height="136" rx="12" fill="#16241E" stroke="#D99A1E" stroke-width="3" transform="rotate(18 233 128)"/>
+    </svg>
+  </div>
+</header>
+
+<div class="wrap">
+  <nav class="toc" aria-label="תוכן העניינים">
+    <ol>
+      <li><a href="#changes">מה השתנה מגרסה 1</a></li>
+      <li><a href="#market">השוק האמיתי</a></li>
+      <li><a href="#today">איך מתמודדים היום</a></li>
+      <li><a href="#competition">מתחרים: מי כבר כאן</a></li>
+      <li><a href="#value">הערך הבלעדי</a></li>
+      <li><a href="#live">הקילר פיצ׳ר: הערוץ החי</a></li>
+      <li><a href="#pricing">ערך נתפס ותמחור</a></li>
+      <li><a href="#make">ייצור: לבד או צד ג׳</a></li>
+      <li><a href="#wear">כשל, בלאי, גניבה וחומר</a></li>
+      <li><a href="#breakeven">כלכלה ונקודות איזון</a></li>
+      <li><a href="#bold">זוויות פורצות דרך</a></li>
+      <li><a href="#gates">60 יום ושערי החלטה</a></li>
+      <li><a href="#keep">מה נשאר מגרסה 1</a></li>
+      <li><a href="#legal">חוק ומדיניות: תוספות</a></li>
+      <li><a href="#risks">סיכונים מעודכנים</a></li>
+      <li><a href="#sources">מקורות</a></li>
+    </ol>
+  </nav>
+
+  <main>
+    <div class="bottom-line">
+      <h2>בשורה התחתונה</h2>
+      <div class="verdict"><b>כן, כניסוי של 60 יום עם קריטריוני עצירה.</b><span class="small">עוד לא כעסק שמרחיבים.</span></div>
+      <p><strong>גרסה 1 מכרה "תג לביקורות עם נתונים". בישראל כבר מוכרים את זה:</strong> TapReview מציעה לוח NFC ודשבורד ב-99 ₪ לחודש<i class="k v">מאומת</i>, ו-Vino מציעה QR לכל שולחן עם קריאה למלצר ובקשת חשבון, בתוכניות שמתחילות ב-89 ₪<i class="k v">מאומת</i>. במחיר ובפיצ׳רים האלה אין לאדם יתרון.</p>
+      <p><strong>גרסה 2 מוכרת ערוץ חי מהשולחן לבעל הבית.</strong> לקוח שמשהו לא בסדר אצלו אומר את זה בנגיעה, והמנהל רואה "שולחן 7" בזמן שהלקוח עוד יושב. באותו מסך, כל לקוח מקבל באותה מידה את הכפתור לביקורת בגוגל, בלי סינון. הכול בחפץ ממותג שאדם מתקין ומתחזק בעצמו. את השילוב הזה לא מצאנו אצל אף מתחרה ישראלי עד 100 ₪ לחודש<i class="k e">הערכה</i>.</p>
+      <p><strong>השוק הרלוונטי:</strong> כ-4,500 בתי קפה, מסעדות וברים עצמאיים עם ישיבה<i class="k e">הערכה</i>, שווים יחד כ-7 מיליון ₪ בשנה במנויים. זה מספיק לעסק צד טוב, ולא לסטארט-אפ. יעד סביר ל-3 שנים: 45-110 לקוחות, ו-5,500-13,500 ₪ הכנסה חודשית קבועה<i class="k e">הערכה</i>.</p>
+      <p><strong>הגורם שהכי ישנה את ההחלטה:</strong> האם לפחות 2 מתוך 3 פיילוטים ממשיכים בתשלום של 89 ₪ ומעלה אחרי חודש הניסיון.</p>
+    </div>
+
+    <section id="changes">
+      <h2><span class="n">1</span>מה השתנה מגרסה 1, ולמה</h2>
+      <p>גרסה 1 טובה: היא מבינה שמוכרים שירות ולא פלסטיק, יורדת לפרטים הטכניים הנכונים ובונה נוסחת מכירה חכמה. השינויים כאן עונים על שש שאלות שהיא עוד לא עונה עליהן.</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>נושא</th><th>גרסה 1</th><th>גרסה 2</th><th>מה זה פותר</th></tr></thead>
+        <tbody>
+          <tr><td>גודל השוק</td><td>ענף של 20 מיליארד ₪</td><td>כ-4,500 עסקים רלוונטיים, כ-7 מיליון ₪ בשנה</td><td>יעד שאפשר למדוד ולתכנן לפיו</td></tr>
+          <tr><td>ההצעה</td><td>תג ביקורות עם דשבורד</td><td>ערוץ חי מהשולחן: קריאה, "משהו לא בסדר", ביקורת לכולם</td><td>בידול מול TapReview, Vino ואמזון</td></tr>
+          <tr><td>תמחור</td><td>25 ₪ לתג ועוד 49-99 ₪ לחודש</td><td>מנוי לפי מספר שולחנות, תגים והתקנה כלולים, דמי הקמה</td><td>מחיר שמבוסס על ערך, והתנגדות "עוד מנוי" נחלשת</td></tr>
+          <tr><td>בלאי וגניבה</td><td>"זול להחליף"</td><td>מודל החלפות עם תקרה, והחלפה בדואר</td><td>העלות האמיתית היא נסיעות, לא פלסטיק</td></tr>
+          <tr><td>ייצור</td><td>מדפסת ביתית, עצירה באמצע ההדפסה</td><td>כיס לצ׳יפ בגב, בנצ׳מרק מול צד ג׳, שלב מעבר ליציקה</td><td>הייצור לא נעצר כשאדם בבסיס</td></tr>
+          <tr><td>החלטה</td><td>"אחרי 60 יום מחליטים לפי המספרים"</td><td>ספים מוגדרים מראש לכל מדד</td><td>יודעים מתי להגביר ומתי לעצור</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section id="market">
+      <h2><span class="n">2</span>השוק האמיתי</h2>
+      <p>הנתון של 20 מיליארד ₪ נכון לענף כולו, אבל רובו לא רלוונטי: רשתות מחליטות במטה, דוכני טייק-אווי אין להם שולחנות, ואולמות אירועים הם עולם אחר. השוק של אדם הוא עסק עצמאי שיש בו ישיבה ובעל בית שמחליט לבד.</p>
+      <div class="funnel" role="list" aria-label="משפך השוק">
+        <div class="fstep" role="listitem"><span class="flabel">עסקים פעילים בענף שירותי אוכל ומשקאות, 2023 <i class="k v">מאומת</i></span><span class="fnum">25,000</span><div class="fbar" style="width:100%"></div></div>
+        <div class="fstep" role="listitem"><span class="flabel">בלי קייטרינג ואולמות, עם סניפי רשתות כנקודות נפרדות <i class="k e">הערכה</i></span><span class="fnum">21,000-23,000</span><div class="fbar" style="width:88%"></div></div>
+        <div class="fstep" role="listitem"><span class="flabel">מתוכם סניפי רשתות (מקדונלד׳ס, ארומה, גרג, לנדוור, רולדין ועוד) <i class="k e">הערכה</i></span><span class="fnum">3,000-4,000</span><div class="fbar" style="width:15%"></div></div>
+        <div class="fstep target" role="listitem"><span class="flabel"><strong>עצמאיים עם ישיבה של 8 שולחנות ומעלה: קהל היעד</strong> <i class="k e">הערכה</i></span><span class="fnum">4,000-5,500</span><div class="fbar" style="width:19%"></div></div>
+        <div class="fstep target" role="listitem"><span class="flabel">מתוכם בתל אביב ובמרכז, שם כדאי להתחיל <i class="k e">הערכה</i></span><span class="fnum">כ-2,000</span><div class="fbar" style="width:8%"></div></div>
+      </div>
+      <p class="small">איך הגענו ל-4,500: שתי דרכים שנפגשות. <strong>דרך הלמ״ס:</strong> 8,642 עסקים בענף עם 5 משרות ומעלה<i class="k v">מאומת</i>. מורידים קייטרינג, זכייני רשתות ומקומות בלי שולחנות, ומוסיפים בתי קפה קטנים שבעליהם עובדים בעצמם. יוצא כ-3,600-4,100. <strong>דרך הפלטפורמות:</strong> אונטופו מדברת על כ-2,000 מסעדות שירות מלא בישראל<i class="k v">מאומת</i>. מוסיפים בתי קפה עם שירות לשולחן, ברים ומסעדות קז׳ואל. יוצא כ-4,500-6,400. בדיקה נוספת: בוולט רשומות כ-6,500 מסעדות, כולל רשתות וטייק-אווי<i class="k v">מאומת</i>, וזה גבול עליון סביר.</p>
+
+      <h3>כמה זה שווה, בצורה מפוכחת</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>שכבה</th><th>עסקים</th><th class="num">ערך שנתי</th><th>הנחה</th></tr></thead>
+        <tbody>
+          <tr><td>השוק הרלוונטי (SAM)</td><td>כ-4,500</td><td class="num">כ-7 מיליון ₪</td><td>מנוי ממוצע של 130 ₪ לחודש <i class="k e">הערכה</i></td></tr>
+          <tr><td>מה שאדם יכול להשיג לבד ב-3 שנים (SOM)</td><td>45-110</td><td class="num">65,000-165,000 ₪</td><td>2-5 לקוחות חדשים בחודש, נטישה 3% בחודש (פרק 10) <i class="k e">הערכה</i></td></tr>
+          <tr><td>נתח שוק שזה מייצג</td><td colspan="3">1%-2.5% מהשוק הרלוונטי בכל הארץ, או 2%-5.5% מהעסקים במרכז</td></tr>
+        </tbody>
+      </table></div>
+      <div class="warn"><strong>שני דברים שהנתונים אומרים על קהלי היעד.</strong> ראשית, 67.8% מעסקי האירוח וההסעדה נסגרים בתוך 4 שנים<i class="k v">מאומת</i>. "מסעדות חדשות" (קהל יעד 2 בגרסה 1) הן לקוח שרוצה ביקורות מהר, אבל גם לקוח שנוטה להיסגר. כדאי לתמחר אותן בתשלום שנתי מראש. שנית, ב-2025 נסגרו 4.6% מהמסעדות, ו-44.9% מהסגירות היו בצפון<i class="k v">מאומת</i>. מתחילים במרכז, וממשיכים לצפון רק כשהמוצר מוכח.</div>
+    </section>
+
+    <section id="today">
+      <h2><span class="n">3</span>איך בעלי עסקים מתמודדים היום, ומה זה עולה</h2>
+      <p>הבעיה שהמוצר פותר היא שבעל הבית לא יודע מה קורה בשולחנות, ולכן שני דברים יוצאים משליטתו. הראשון הוא הדירוג בגוגל, שנקבע בעיקר על ידי מי שהכי כעס. השני הוא הלקוח שהמתין, לא קיבל מענה, וקם בלי להזמין עוד משהו.</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>מה עושים היום</th><th>כמה זה עולה</th><th>מה חסר</th></tr></thead>
+        <tbody>
+          <tr><td>המלצרים מבקשים ביקורת בעל פה</td><td>זמן צוות</td><td>לא עקבי. מאפריל 2026 גוגל אוסרת במפורש מכסות לצוות ובקשה להזכיר שם של עובד<i class="k v">מאומת</i></td></tr>
+          <tr><td>QR מודפס על שלט שולחן או על החשבונית</td><td>כ-5-30 ₪ לשלט <i class="k e">הערכה</i></td><td>קבוע, בלי נתונים, מתיישן כשהתפריט משתנה</td></tr>
+          <tr><td>SMS אחרי הביקור</td><td>2-3 אגורות להודעה<i class="k v">מאומת</i></td><td>צריך מספרי טלפון (פרטיות, חוק הספאם). הרבה תבניות שואלות "כמה כוכבים?" ושולחות לגוגל רק את המרוצים, וזה אסור</td></tr>
+          <tr><td>סקרי וואטסאפ עם התראות (Be5)</td><td>350-750 ₪ לחודש, 1,000 ₪ הקמה ותשלום לכל סקר<i class="k v">מאומת</i></td><td>יקר, ומגיע אחרי שהלקוח כבר הלך</td></tr>
+          <tr><td>תפריט QR עם קריאה למלצר (Vino, Algora)</td><td>חינם עד 99 ₪ לחודש<i class="k v">מאומת</i></td><td>מדבקה גנרית. Vino מעודדת רק "סועדים מרוצים" לכתוב ביקורת<i class="k v">מאומת</i>, וזה אזור אפור מול גוגל</td></tr>
+          <tr><td>סטנד NFC מאמזון</td><td>20-50 דולר, חד פעמי<i class="k v">מאומת</i></td><td>גנרי, קישור קבוע, אין מזהה שולחן ואין שירות</td></tr>
+          <tr><td><strong>לא עושים כלום</strong></td><td>0 ₪ בקופה</td><td>ראה למטה: זה המחיר הגבוה ביותר</td></tr>
+        </tbody>
+      </table></div>
+      <h3>כמה עולה לא לעשות כלום</h3>
+      <ul>
+        <li><strong>דירוג שווה כסף, בעיקר לעצמאיים.</strong> מחקר של הרווארד (Luca) מצא שעלייה של כוכב אחד ב-Yelp מביאה לעלייה של 5%-9% בהכנסות. האפקט נמצא <em>רק במסעדות עצמאיות, לא ברשתות</em><i class="k v">מאומת</i>. זה בדיוק קהל היעד של אדם.</li>
+        <li><strong>חצי כוכב קובע אם המקום מתמלא.</strong> מחקר מברקלי מצא שתוספת של חצי כוכב מעלה ב-19 נקודות אחוז את הסיכוי שמסעדה תהיה מלאה בשעות השיא<i class="k v">מאומת</i>.</li>
+        <li><strong>לקוחות מסננים לפי מספרים.</strong> לפי סקר BrightLocal מ-2026 (ארה״ב): 68% דורשים לפחות 4 כוכבים, 47% נמנעים מעסק עם פחות מ-20 ביקורות, ו-74% רוצים ביקורות מ-3 החודשים האחרונים<i class="k v">מאומת</i>. ביקורות טריות הן לא בונוס. הן תנאי כניסה.</li>
+        <li><strong>בתרגום לשקלים:</strong> לבית קפה עם מחזור של 160,000 ₪ בחודש, שיפור של עשירית כוכב שווה בערך 800-1,450 ₪ בחודש<i class="k e">הערכה</i>. זו העברה של תוצאות Yelp בארה״ב לגוגל בישראל, ולכן זו הערכה ולא הבטחה.</li>
+      </ul>
+      <div class="note">ולקח ישראלי: אחרי 7 באוקטובר גוגל חסמה ביקורות על עסקים בישראל עד יולי 2024<i class="k v">מאומת</i>. מוצר שכל הערך שלו הוא "עוד ביקורות" יכול להתאדות בהחלטה אחת בקליפורניה. הערוץ החי ממשיך לעבוד גם אז.</div>
+    </section>
+
+    <section id="competition">
+      <h2><span class="n">4</span>מתחרים: מי כבר כאן ובכמה</h2>
+      <p>בגרסה 1 המתחרים הם "אמזון ומוכרים באינסטגרם". בפועל יש בישראל כמה חברות תוכנה שמוכרות בדיוק באזור המחיר שתוכנן. הן גם מחלקות בינהן את התחום.</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>מתחרה</th><th>מה נותן</th><th class="num">מחיר</th><th>החולשה מול אדם</th></tr></thead>
+        <tbody>
+          <tr><td>TapReview (ישראל)</td><td>לוח NFC ודשבורד מוניטין</td><td class="num">99 ₪ לחודש<i class="k v">מאומת</i></td><td>ביקורות בלבד, בלי מזהה לשולחן ובלי ערוץ חי. מוצר חדש<i class="k e">הערכה</i></td></tr>
+          <tr><td>TapTap (ישראל)</td><td>כרטיסי NFC, מעקב איזה עובד הביא ביקורת</td><td class="num">199 ₪ לחודש, או 1,199-1,899 ₪ לתמיד<i class="k v">מאומת</i></td><td>כותבים במפורש שביקורות שליליות "מגיעות לבעלים ולא מתפרסמות"<i class="k v">מאומת</i>. זה סינון שגוגל אוסרת</td></tr>
+          <tr><td>Vino (ישראל)</td><td>תפריט QR, הזמנה, קריאה למלצר, חשבון, לוח שירות</td><td class="num">תפריט חינם, תוכניות מ-89 ₪<i class="k v">מאומת</i></td><td>מדבקת QR גנרית, בלי חפץ ממותג ובלי אדם שמגיע לעסק. מדגישה עידוד של "מרוצים" לביקורת</td></tr>
+          <tr><td>Hopa (ישראל)</td><td>תפריט והזמנות עם NFC לכל שולחן</td><td class="num">400-1,290 ₪ לחודש, תג NFC 50-70 ₪<i class="k v">מאומת</i></td><td>יקר ומורכב, מתאים למסעדות גדולות</td></tr>
+          <tr><td>Algora (ישראל)</td><td>תפריט דיגיטלי ב-QR או NFC</td><td class="num">מ-99 ₪ לחודש<i class="k v">מאומת</i></td><td>תפריט בלבד</td></tr>
+          <tr><td>Tabit, Beecomm (קופות)</td><td>תשלום מהשולחן, סקרי משוב</td><td class="num">לא מפורסם</td><td>לא מתחרים. אם יש להם, התג מפנה לשם</td></tr>
+          <tr><td>Tattle, Ovation (ארה״ב)</td><td>משוב בזמן אמת והתראות למנהל</td><td class="num">65-125 דולר לסניף לחודש<i class="k v">מאומת</i></td><td>לא בישראל, לא בעברית. אבל הם מוכיחים שמשלמים על זה</td></tr>
+          <tr><td>סטנדים מאמזון (TapFive ואחרים)</td><td>סטנד NFC לביקורות</td><td class="num">20-50 דולר חד פעמי<i class="k v">מאומת</i></td><td>גנרי, באנגלית, קישור קבוע</td></tr>
+        </tbody>
+      </table></div>
+      <h3>האם צריך בידול חד יותר? כן, משלוש סיבות</h3>
+      <ol>
+        <li><strong>נקודת המחיר תפוסה.</strong> 89-99 ₪ לחודש זה בדיוק המחיר של TapReview, Vino ו-Algora. מנוי ב-49-99 ₪ על "ביקורות ודשבורד" יתחרה במחיר מול חברות תוכנה, ושם אדם לא ינצח.</li>
+        <li><strong>החומרה היא מצרך.</strong> סטנד NFC עולה 20 דולר באמזון, וגם Vino נותנת סטנדים לכל שולחן. הדפסה בתלת מימד יפה, אבל היא לא סיבה לשלם כל חודש.</li>
+        <li><strong>גם "קריאה למלצר" כבר קיימת</strong> (Vino). פיצ׳ר אחד לא מספיק. צריך שילוב שקשה להעתיק: חפץ, שירות אישי, ערוץ חי ועמידה בכללים.</li>
+      </ol>
+      <p>מה <strong>לא</strong> לעשות: לא להיכנס להזמנות ולתשלומים. שם Tabit, Vino ו-Hopa חזקים ויקרים לבנות. אם לעסק יש מערכת כזו, התג של אדם פשוט מפנה אליה, והוא הופך לשותף ולא למתחרה.</p>
+    </section>
+
+    <section id="value">
+      <h2><span class="n">5</span>הערך הבלעדי, בהגדרה מדויקת</h2>
+      <div class="quote">שולחן שמדבר עם בעל הבית בזמן אמת. כל לקוח יכול, בנגיעה אחת, לקרוא לצוות, להגיד שמשהו לא בסדר, או לכתוב ביקורת פומבית. בעל הבית יודע מאיזה שולחן ומתי, ומטפל בזמן שהלקוח עוד כאן.<small>בחפץ בצבעים ובלוגו של העסק, שאדם מתקין ומתחזק בעצמו. בלי קופה חדשה, בלי אפליקציה, ובלי סיכון מול מדיניות גוגל.</small></div>
+      <p>ובגרסה של משפט אחד, לשיחת מכירה: <strong>"אתה תדע על הבעיה כשהלקוח עוד יושב, ולא כשהוא כבר כתב עליה."</strong></p>
+      <h3>למה דווקא זה הערך הבלעדי</h3>
+      <div class="flow">
+        <div><h4>המזהה לשולחן</h4><p>כבר קיים בגרסה 1 בשביל סטטיסטיקה. כאן הוא הופך לכתובת: ההתראה אומרת "שולחן 7", והמלצר יודע לאן ללכת.</p></div>
+        <div><h4>הרגע</h4><p>המשוב מגיע בזמן הארוחה, כשעוד אפשר לתקן. סקר וואטסאפ מגיע אחרי שהלקוח הלך, וביקורת בגוגל מגיעה כשכבר מאוחר.</p></div>
+        <div><h4>היושרה</h4><p>כפתור הביקורת מוצג לכל לקוח, תמיד, באותו גודל. מתחרים שמסננים חשופים למחיקת ביקורות. אצל אדם זה נקודת מכירה.</p></div>
+      </div>
+      <p>מה מזה אפשר להעתיק? את התוכנה, בתוך כמה חודשים. מה קשה להעתיק: את השילוב של חפץ ממותג, התקנה ותחזוקה אישית, צפיפות לקוחות ברחוב אחד, והיסטוריית נתונים של כל שולחן שמצטברת אצל אדם. זה החפיר. הוא לא טכנולוגי, הוא מקומי.</p>
+      <div class="warn"><strong>ניסוח שיווקי זהיר.</strong> לא לכתוב "מונע ביקורות שליליות". גוגל אוסרת "להרתיע או למנוע ביקורות שליליות"<i class="k v">מאומת</i>. כדאי לכתוב "פותרים את הבעיה כשהלקוח עוד כאן". הכפתור לגוגל נשאר גלוי לכולם, והלקוח מחליט.</div>
+    </section>
+
+    <section id="live">
+      <h2><span class="n">6</span>הקילר פיצ׳ר: הערוץ החי</h2>
+      <p>לקוח מצמיד טלפון או סורק. נפתח מסך אחד, וכל הכפתורים מוצגים יחד. אין שאלה מקדימה של "איך היה?", ואין מסלול שונה למרוצים ולמאוכזבים:</p>
+      <div class="phone" aria-label="הדמיה: מסך הלקוח">
+        <div class="brand">קפה הגפן · שולחן 7</div>
+        <div class="btns">
+          <span class="live">קריאה לצוות</span>
+          <span class="live">משהו לא בסדר?</span>
+          <span>תפריט</span>
+          <span>דרגו אותנו בגוגל</span>
+          <span>וייפיי</span>
+          <span>אינסטגרם</span>
+        </div>
+        <div class="foot">"משהו לא בסדר?" נשלח רק לצוות. הכפתור לגוגל תמיד כאן, לכולם.</div>
+      </div>
+      <p>בצד של העסק: לוח חי בטאבלט ליד הבר, או התראה בטלפון של המנהל:</p>
+      <div class="board" aria-label="הדמיה: לוח השירות">
+        <div><span class="pill issue">לא בסדר</span><span>שולחן 7 · "הקפה הגיע קר"</span><b>לפני 0:40</b></div>
+        <div><span class="pill call">קריאה</span><span>שולחן 3 · חשבון</span><b>לפני 1:15</b></div>
+        <div><span class="pill done">טופל</span><span>שולחן 11 · קריאה</span><b>1:52 דק׳</b></div>
+      </div>
+      <h3>מה זה נותן לבעל הבית, בשקלים</h3>
+      <ul>
+        <li><strong>הזמנה נוספת:</strong> לקוח שרצה עוד קפה ולא תפס מלצר, מקבל אותו. בבית קפה, כוס נוספת היא 12-14 ₪ רווח גולמי<i class="k e">הערכה</i>. <strong>המנוי מחזיר את עצמו בכוס קפה נוספת אחת ביום.</strong><i class="k h">לבדיקה</i></li>
+        <li><strong>לקוח שניצל:</strong> בעיה שטופלה במקום היא לקוח שחוזר, ולפעמים ביקורת טובה במקום רעה.</li>
+        <li><strong>נתון חדש לגמרי:</strong> זמן תגובה ממוצע לקריאה, לפי שולחן ולפי שעה. מנהלים לא מכירים את המספר הזה היום.</li>
+      </ul>
+      <h3>הערות טכניות לבנייה</h3>
+      <ul>
+        <li><strong>התראות בלי עלות לכל הודעה:</strong> דף ווב פשוט שפתוח בטאבלט, או התראות Push מאפליקציית ווב (PWA). באייפון זה עובד רק אחרי "הוסף למסך הבית". וואטסאפ עסקי גובה על הודעות, אז לא מתחילים ממנו.</li>
+        <li><strong>קריאות מזויפות:</strong> הגבלת קצב לכל תג (קריאה אחת ל-2 דקות), וכפתור "לא רלוונטי" בלוח. בהמשך אפשר לעבור לצ׳יפ NTAG 424 DNA, שמייצר קוד חדש בכל נגיעה. כך אי אפשר "לקרוא" משולחן מרחוק עם קישור מועתק<i class="k e">הערכה</i>.</li>
+        <li><strong>סדר בנייה מעודכן:</strong> (1) הפניה ורישום סריקות, (2) דף לקוח עם שישה כפתורים, (3) לוח חי לעסק, (4) דוח חודשי אוטומטי, (5) עריכה עצמית, (6) גבייה. הלוח החי עולה לשלב 3 כי הוא מה שמוכרים.</li>
+      </ul>
+    </section>
+
+    <section id="pricing">
+      <h2><span class="n">7</span>ערך נתפס, גובה המנוי ומספר התגים</h2>
+      <p>יש כאן שני מספרים שונים. <strong>הערך האמיתי</strong> הוא כמה העסק מרוויח מהמוצר. <strong>הערך הנתפס</strong> הוא מה שבעל העסק מאמין שהוא מקבל לפני שראה נתונים. היום הערך הנתפס מעוגן במחירי חומרה (40 ₪ באמזון) ובמנויים של 89-99 ₪. תפקיד הפיילוט הוא להעביר את השיחה מהמספר השני לראשון.</p>
+
+      <div class="calc" id="ov">
+        <h3>מחשבון: כמה המוצר שווה לבית עסק</h3>
+        <div class="grid">
+          <div><label for="ov-tables">מספר שולחנות</label><input id="ov-tables" type="number" min="1" max="80" value="12"></div>
+          <div><label for="ov-turns">סועדים לשולחן ביום</label><input id="ov-turns" type="number" min="1" max="60" value="13"></div>
+          <div><label for="ov-days">ימי פעילות בחודש</label><input id="ov-days" type="number" min="1" max="31" value="26"></div>
+          <div><label for="ov-check">חשבון ממוצע לסועד (₪, לפני מע״מ)</label><input id="ov-check" type="number" min="1" value="40"></div>
+          <div><label for="ov-gm">רווח גולמי על מנה נוספת (%)</label><input id="ov-gm" type="number" min="0" max="100" value="68"></div>
+          <div><label for="ov-extra">% מהסועדים שמזמינים עוד פריט בזכות קריאה מהירה</label><input id="ov-extra" type="number" min="0" max="20" step="0.1" value="0.5"></div>
+          <div><label for="ov-item">מחיר פריט נוסף (₪)</label><input id="ov-item" type="number" min="0" value="16"></div>
+          <div><label for="ov-issue">% מהסועדים שמדווחים "משהו לא בסדר"</label><input id="ov-issue" type="number" min="0" max="10" step="0.05" value="0.2"></div>
+          <div><label for="ov-saved">שווי לקוח שניצל (₪ רווח)</label><input id="ov-saved" type="number" min="0" value="150"></div>
+        </div>
+        <div class="out" aria-live="polite">
+          <div><b id="ov-o-rev">–</b><span>מחזור חודשי משוער של העסק</span></div>
+          <div><b id="ov-o-val">–</b><span>ערך בסיס בחודש (הזמנות נוספות ולקוחות שניצלו)</span></div>
+          <div><b id="ov-o-range">–</b><span>מחיר הוגן: 10%-20% מהערך</span></div>
+          <div><b id="ov-o-roi">–</b><span>פי כמה הערך מהמחיר במדרגה</span></div>
+        </div>
+        <p class="foot">ההנחה היא שמתוך לקוחות שדיווחו על בעיה, שליש היו הולכים או כותבים ביקורת רעה אילו לא טופלו. ביקורות ודירוג לא נכנסים לחישוב, והם אפסייד. ערכי ברירת המחדל הם הערכות<i class="k h">לבדיקה</i>. בפיילוט מחליפים אותם במספרים אמיתיים מהלוח.</p>
+      </div>
+
+      <h3>מבנה המחיר המומלץ</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>מוצר</th><th class="num">מחיר</th><th>מה כלול</th></tr></thead>
+        <tbody>
+          <tr><td>תג בלבד (כניסה)</td><td class="num">49 ₪ לתג, מינימום 8</td><td>תג ממותג, דף עסק קבוע. בלי נתונים ובלי ערוץ חי. התג כבר מפנה לשרת של אדם, כך ששדרוג למנוי לא דורש להחליף אף תג</td></tr>
+          <tr><td>שולחן חי, עד 14 שולחנות</td><td class="num">89 ₪ לחודש</td><td rowspan="3">תגים לכל השולחנות, לדלפק ולכניסה, ועוד 10% רזרבה. עיצוב, התקנה, ערוץ חי, לוח שירות, דשבורד, דוח חודשי, וייפיי, תפריט. החלפות עד 20% מהתגים בשנה (מעבר לזה 25 ₪ לתג)</td></tr>
+          <tr class="hl"><td class="pick">שולחן חי, 15-24 שולחנות</td><td class="num pick">149 ₪ לחודש</td></tr>
+          <tr><td>שולחן חי, 25-34 שולחנות</td><td class="num">199 ₪ לחודש, ועוד 6 ₪ לכל שולחן מעל 34</td></tr>
+          <tr><td>דמי הקמה</td><td class="num">390 ₪ חד פעמי</td><td>עיצוב והתקנה. מבוטלים בתשלום שנתי מראש (12 חודשים במחיר של 10)</td></tr>
+        </tbody>
+      </table></div>
+      <h3>למה המספרים האלה</h3>
+      <ul>
+        <li><strong>מהערך:</strong> לפי המחשבון, הערך הבסיסי הוא כ-50 ₪ לשולחן בחודש<i class="k e">הערכה</i>. מחיר של 10%-20% ממנו הוא 5-10 ₪ לשולחן. המדרגות בנויות כך שבכל גודל עסק המחיר הוא 6-11 ₪ לשולחן, כלומר 11%-21% מהערך המשוער.</li>
+        <li><strong>מהשוק:</strong> המדרגה הקטנה (89 ₪) שווה ל-Vino וזולה מ-TapReview, וכוללת חומרה. המדרגה האמצעית (149 ₪) יקרה מהם. היא מוצדקת רק בזכות הערוץ החי, וזו הנקודה שהפיילוט צריך להוכיח. כלים אמריקאיים לערוץ כזה גובים 65-125 דולר לסניף<i class="k v">מאומת</i>.</li>
+        <li><strong>ממספר התגים:</strong> כדי שהערוץ החי יעבוד צריך תג בכל שולחן. לכן המחיר עולה עם מספר השולחנות, כי עסק גדול יותר מקבל יותר ערך. עלות התג עצמו (כ-9 ₪) היא פרט שולי במחיר.</li>
+        <li><strong>למה התגים כלולים:</strong> כשמוכרים תג ב-25 ₪, בעל הבית משווה לאמזון. כשהתג כלול, הוא משווה לתוצאה. וההחלפות הן עלות שאדם שולט בה (פרק 9), כל עוד יש להן תקרה.</li>
+        <li><strong>ניסיון:</strong> חודש אחד חינם ולא שניים. בחודש השני כבר רואים אם הם משלמים, ולא מבזבזים עוד חודש.</li>
+      </ul>
+      <p class="small">כל המחירים לפני מע״מ. בשנה הראשונה אדם כנראה יהיה עוסק פטור (תקרה של 122,833 ₪ ב-2026<i class="k v">מאומת</i>). כדאי לרשום "לפני מע״מ" כבר עכשיו, כדי שבמעבר לעוסק מורשה המחיר לא יקפוץ פתאום ב-18%. בעסקאות מול עסקים זה לא מפריע: הם מקזזים את המע״מ.</p>
+    </section>
+
+    <section id="make">
+      <h2><span class="n">8</span>ייצור: לבד, או אצל צד ג׳</h2>
+      <p>לפני ההשוואה, תיקון להנחה אחת מגרסה 1: סטנד של 45-50 גרם לוקח כנראה 1.2-2 שעות הדפסה, ולא 30-60 דקות<i class="k e">הערכה</i>. 500 סטנדים הם כ-750 שעות מדפסת, כלומר 6-7 שבועות רצופים על מדפסת אחת. בתרחיש הבסיס צריך כ-80 יחידות בחודש: 3.5 לקוחות חדשים, סטנדי דוגמה והחלפות. זה 100-160 שעות מדפסת. מדפסת אחת יכולה לעמוד בזה, <strong>אבל רק אם היא עובדת בלי אדם.</strong> בשיטת העצירה להכנסת הצ׳יפ, כל משטח צריך אותו ליד המדפסת, ובשבוע בבסיס הייצור נעצר.</p>
+
+      <div class="chart" id="mk-chart">
+        <h4>עלות סטנד אחד לפי דרך ייצור, כולל צ׳יפ ומדבקה</h4>
+        <p class="sub">₪ ליחידה, לפני מע״מ. כל פס הוא טווח מהערכה הזולה ליקרה. יציקה מופיעה בטבלה, כי היא רלוונטית רק מ-5,000 יחידות.</p>
+        <div class="legend" style="margin:0 0 10px"><span><svg width="18" height="8" aria-hidden="true"><rect width="18" height="8" rx="3" fill="var(--s1)"/></svg>הזמנה של 100 יחידות</span><span><svg width="18" height="8" aria-hidden="true"><rect width="18" height="8" rx="3" fill="var(--s2)"/></svg>הזמנה של 500 יחידות</span></div>
+        <div class="rb" id="mk-rows"></div>
+        <div class="rb-axis" id="mk-axis" aria-hidden="true"></div>
+        <div class="tip" id="mk-tip" hidden></div>
+      </div>
+
+      <div class="table-wrap"><table>
+        <thead><tr><th>דרך ייצור</th><th class="num">100 יח׳</th><th class="num">500 יח׳</th><th>מה חשוב לדעת</th></tr></thead>
+        <tbody>
+          <tr><td>הדפסה ביתית, PETG, כסף בלבד</td><td class="num">8-9 ₪</td><td class="num">5-6.5 ₪</td><td>פילמנט ב-89-169 ₪ לק״ג בישראל<i class="k v">מאומת</i>, חשמל כ-0.08 ₪ ליחידה, פחת מדפסת ו-4%-7% פסולת <i class="k e">הערכה</i></td></tr>
+          <tr><td>הדפסה ביתית, כולל זמן עבודה</td><td class="num">13-14 ₪</td><td class="num">9-10.5 ₪</td><td>4-5 דקות עבודה ליחידה, לפי 60 ₪ לשעה <i class="k e">הערכה</i></td></tr>
+          <tr class="hl"><td>FDM בחו״ל (Craftcloud), כולל שילוח ושחרור ממכס</td><td class="num">12-15 ₪</td><td class="num">8-10 ₪</td><td>הצעת מחיר אמיתית, PETG: 1.94 דולר ליחידה ב-100 ו-1.36-1.46 ב-500, מספק בבולגריה<i class="k v">מאומת</i>. זמן אספקה 2-3 שבועות. מוסיפים מע״מ יבוא של 18% ועמיל מכס של 150-500 ₪ למשלוח. הצ׳יפ מודבק בארץ</td></tr>
+          <tr><td>אקריליק עם הדפסת UV, מסין, כולל צ׳יפ</td><td class="num">14-17 ₪</td><td class="num">11-13 ₪</td><td>2.50-2.99 דולר ליחידה במינימום 100, לפי מודעה ב-Alibaba<i class="k e">הערכה</i>, ועוד שילוח. הלוגו בצבע מלא, אבל כל עיצוב הוא הזמנה נפרדת</td></tr>
+          <tr><td>מכון הדפסה בישראל</td><td class="num">30-70 ₪</td><td class="num">20-45 ₪</td><td>מינימום הזמנה 200-300 ₪, 2.5-5 ₪ לגרם<i class="k v">מאומת</i>. מתאים רק להזמנה דחופה</td></tr>
+          <tr><td>יציקה בתבנית מסין</td><td class="num">לא רלוונטי</td><td class="num">3.5-6.5 ₪ ב-5,000</td><td>תבנית פשוטה ב-1,000-4,000 דולר<i class="k v">מאומת</i>. הלוגו רק במדבקה או בהדפסה</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>נקודות האיזון בייצור</h3>
+      <ul>
+        <li><strong>לבד מול צד ג׳ בחו״ל:</strong> בהזמנה של 100, צד ג׳ זול יותר כששעת העבודה של אדם שווה יותר מ-60 ₪. בהזמנה של 500 הסף יורד ל-39 ₪ לשעה<i class="k e">הערכה</i>. כלומר, ברגע שיש נפח, הזמן של אדם יקר מהפלסטיק.</li>
+        <li><strong>יציקה:</strong> תבנית ב-4,600-12,200 ₪, שחוסכת 4-6 ₪ ליחידה, מחזירה את עצמה אחרי 760-3,050 יחידות<i class="k e">הערכה</i>. זה בערך 1,000-2,000 יחידות בשנה, כלומר 60-120 לקוחות פעילים. לא לפני השנה השנייה או השלישית.</li>
+        <li><strong>מכון ישראלי:</strong> פי 2-5 יקר יותר. רק לגיבוי כשהמדפסת מושבתת.</li>
+      </ul>
+
+      <h3>השינוי בעיצוב שמאפשר את כל זה: "גוף ופנים"</h3>
+      <p>במקום סטנד אחד שנסגר על הצ׳יפ באמצע ההדפסה, שני חלקים:</p>
+      <ul>
+        <li><strong>הגוף:</strong> זהה לכל הלקוחות, ב-PETG או ASA, בלי עצירה. יש בו כיס לצ׳יפ בחלק האנכי, 10 מ״מ לפחות מעל השולחן. מדפיסים בלילה בלי השגחה, או מזמינים 200-500 מחו״ל.</li>
+        <li><strong>הפנים:</strong> לוחית של 2 מ״מ עם הלוגו, הצבעים וה-QR. מדפיסים בבית ללקוח, 20-30 דקות ללוחית, והיא נדבקת או ננעצת על הגוף ומכסה את הצ׳יפ. דרך 1-2 מ״מ פלסטיק הצ׳יפ נקרא הכי טוב<i class="k v">מאומת</i>.</li>
+      </ul>
+      <p>מה זה פותר: אין עצירות, אז המדפסת עובדת גם כשאדם בבסיס. הייצור ללקוח מהיר פי 3-4, כי מדפיסים רק לוחיות. את הצ׳יפ בודקים לפני שסוגרים. אם הלוחית נשברה או שהעסק מחליף לוגו, מחליפים רק אותה, והיא נכנסת במעטפה. ואפשר להעביר את הגופים לצד ג׳ בלי לאבד את המיתוג האישי, שהוא היתרון של אדם.</p>
+    </section>
+
+    <section id="wear">
+      <h2><span class="n">9</span>כשל, בלאי, גניבה ורגישות החומר</h2>
+      <p>גרסה 1 אומרת "זול להחליף". זה נכון, אבל בלי מספרים אי אפשר לדעת כמה החלפות מבטיחים בחינם. כאן כל מקור כשל מקבל הנחה מפורשת.</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>מקור כשל</th><th>הנחה</th><th>מה זה עולה</th><th>מה עושים</th></tr></thead>
+        <tbody>
+          <tr><td>הדפסה נכשלת</td><td>3%-8% אצל מדפיס מנוסה, 5%-10% בהתחלה עם עצירות<i class="k v">מאומת</i></td><td>0.5-1 ₪ ליחידה</td><td>בלי עצירות, פילמנט יבש, משטח נקי. היעד 2%-4%</td></tr>
+          <tr><td>שכבות נפרדות או התנגשות ראש אחרי עצירה</td><td>מדווח בפורומים של Bambu<i class="k v">מאומת</i></td><td>סטנד לפח, כולל הצ׳יפ</td><td>נעלם בעיצוב "גוף ופנים"</td></tr>
+          <tr><td>צ׳יפ פגום מהמפעל</td><td>0.5%-3% במותגים לא מוכרים<i class="k e">הערכה</i></td><td>אם נאטם בפנים, כל הסטנד</td><td>נגיעת בדיקה לכל צ׳יפ לפני סגירה. צ׳יפים של NXP מספק מוכר (0.19-0.65 אירו ליחידה)<i class="k v">מאומת</i></td></tr>
+          <tr><td>לא נקרא על שולחן מתכת</td><td>תלוי שולחן</td><td>סריקות שהולכות לאיבוד</td><td>רווח של 3 מ״מ מהמתכת כבר עובד כמו צ׳יפ ייעודי למתכת<i class="k v">מאומת</i>. הכיס בגובה 10 מ״מ ומעלה</td></tr>
+          <tr><td>עיוות בחום</td><td>ודאי ל-PLA בשמש (ראה טבלת חומרים)</td><td>כל הסט החיצוני מחדש</td><td>ASA לכל שולחן בחוץ</td></tr>
+          <tr><td>חומרי ניקוי</td><td>נמוך בניגוב יומי</td><td>הלבנה והחלשה עם הזמן</td><td>PETG או ASA ליד המטבח, בלי מסיר שומנים בסיסי על PLA</td></tr>
+          <tr><td>גניבה ואובדן</td><td>5%-15% בשנה<i class="k e">הערכה</i>. אין נתוני ענף, ובודקים גם 40%</td><td>ראה המודל למטה</td><td>דבק או משקולת בבסיס, הטמעה בחפץ קיים, תקרת החלפות</td></tr>
+          <tr><td>שכתוב הצ׳יפ</td><td>קרה בפועל במקדונלד׳ס<i class="k v">מאומת</i></td><td>לקוחות נשלחים ליעד זר</td><td>נעילה לצמיתות, כמו בגרסה 1</td></tr>
+          <tr><td>מדבקת QR מזויפת מעל האמיתית</td><td>אזהרת FBI<i class="k v">מאומת</i></td><td>הונאה בשם העסק</td><td>QR מודפס על לוחית הפנים ולא כמדבקה. שם העסק תמיד מופיע בראש הדף</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>רגישות החומר</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>חומר</th><th class="num">מעבר זכוכית</th><th class="num">עיוות תחת עומס</th><th>שמש</th><th>ניקוי</th><th>מתי</th></tr></thead>
+        <tbody>
+          <tr><td>PLA</td><td class="num">60°C</td><td class="num">54-57°C</td><td>מתעקם, ומתחיל להתפורר תחת UV<i class="k v">מאומת</i></td><td>רגיש לבסיסים ולאלכוהול איזופרופילי<i class="k v">מאומת</i></td><td>דוגמאות, ושולחנות פנימיים רחוק מחלון</td></tr>
+          <tr class="hl"><td>PETG</td><td class="num">69°C</td><td class="num">68-71°C</td><td>גבולי בשמש ישירה</td><td>טוב</td><td>ברירת המחדל בפנים</td></tr>
+          <tr><td>ASA</td><td class="num">התרככות ב-106°C</td><td class="num">92-100°C</td><td>בטוח</td><td>טוב מאוד</td><td>כל שולחן בחוץ, כולל מרפסת מוצלת</td></tr>
+        </tbody>
+      </table></div>
+      <p class="small">נתוני החומרים מגיליונות היצרן של Bambu<i class="k v">מאומת</i>. לוח מחוונים ברכב הגיע בממוצע ל-69°C אחרי שעה בשמש, בטמפרטורת אוויר של 37°C<i class="k v">מאומת</i>. משטח כהה בשמש של קיץ ישראלי מגיע כנראה ל-60-75°C<i class="k e">הערכה</i>. גם הצ׳יפ עצמו מוגדר לפעולה עד 70°C בלבד<i class="k v">מאומת</i>.</p>
+
+      <h3>כמה עולות ההחלפות, בשלושה תרחישים</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>אובדן שנתי</th><th class="num">החלפה בדואר</th><th class="num">החלפה בביקור</th><th class="num">בדואר, כאחוז ממנוי של 149 ₪</th></tr></thead>
+        <tbody>
+          <tr><td>10%</td><td class="num">8 ₪ לחודש</td><td class="num">13 ₪ לחודש</td><td class="num">5%</td></tr>
+          <tr class="hl"><td>20% (הנחת הבסיס)</td><td class="num">10 ₪ לחודש</td><td class="num">15 ₪ לחודש</td><td class="num">7%</td></tr>
+          <tr><td>40% (תרחיש קשה)</td><td class="num">14 ₪ לחודש</td><td class="num">18 ₪ לחודש</td><td class="num">9%</td></tr>
+        </tbody>
+      </table></div>
+      <p class="small">לעסק של 17 תגים, כולל זמן עבודה לפי 50 ₪ לשעה. דואר: שני משלוחים בשנה ב-25 ₪ כל אחד. ביקור: שעה ודלק, פעמיים בשנה<i class="k e">הערכה</i>.</p>
+      <p><strong>המסקנה:</strong> גם בתרחיש הקשה, ההחלפות אוכלות כ-9% ממנוי של 149 ₪, וכ-12% מהמדרגה הקטנה (89 ₪). הפלסטיק כמעט לא משנה. מה שמכפיל את העלות הוא הנסיעה. לכן: החלפה בדואר עם דבק מוכן, ותקרה של 20% מהתגים בשנה. בלי תקרה, בר אחד שמאבד 60% בשנה יכול להפוך ללקוח מפסיד.</p>
+
+      <h3>הדירות: שכל סטנד ייצא כמו הקודם</h3>
+      <ul>
+        <li>גליל פילמנט מאותה אצווה לכל לקוח, ושמירה של שארית לצורך החלפות, כדי שהגוון יהיה זהה.</li>
+        <li>קובץ לכל לקוח עם מספר גרסה: הלוגו, הצבעים ומספרי השולחנות. החלפה אחרי שנה צריכה לצאת זהה.</li>
+        <li>נגיעת בדיקה בשני טלפונים, אייפון ואנדרואיד, לכל תג לפני שהוא יוצא. הנגיעה נרשמת במערכת כ"נבדק". בהתקנה נגיעה נוספת נרשמת כ"הותקן", וכך יש תיעוד לכל תג.</li>
+        <li>כיול של כיס הצ׳יפ פעם בחודש: מדפסת Bambu מחזיקה סטייה של 0.1-0.2 מ״מ<i class="k e">הערכה</i>, ולכן מרווח של 0.3-0.4 מ״מ סביב צ׳יפ של 25 מ״מ.</li>
+      </ul>
+    </section>
+
+    <section id="breakeven">
+      <h2><span class="n">10</span>כלכלת יחידה ונקודות איזון</h2>
+      <div class="gates">
+        <div class="gate"><h4>איזון תזרימי</h4><div class="t">כ-4 לקוחות</div><p>משלמים מכסים את ההוצאות הקבועות: אחסון, גבייה, רואה חשבון ו-Meshy, כ-450 ₪ בחודש<i class="k e">הערכה</i>.</p></div>
+        <div class="gate"><h4>החזר עלות לקוח</h4><div class="t">כ-5 חודשים</div><p>כשמחשבים את זמנו של אדם (כ-7 שעות לגיוס והתקנה של לקוח). בכסף בלבד, דמי ההקמה כמעט מכסים את החומרה.</p></div>
+        <div class="gate"><h4>לבד מול צד ג׳</h4><div class="t">60 / 39 ₪ לשעה</div><p>השווי של שעת עבודה שמעליו זול יותר להזמין גופים מבחוץ (בהזמנה של 100 / 500).</p></div>
+        <div class="gate"><h4>יציקה</h4><div class="t">1,000-2,000 יח׳ בשנה</div><p>הנפח שמצדיק תבנית. בערך 60-120 לקוחות פעילים.</p></div>
+      </div>
+
+      <div class="calc" id="bz">
+        <h3>מחשבון: 12 החודשים הראשונים</h3>
+        <div class="grid">
+          <div><label for="bz-new">לקוחות חדשים בחודש</label><input id="bz-new" type="number" min="0" step="0.5" value="3.5"></div>
+          <div><label for="bz-price">מנוי ממוצע (₪ לחודש)</label><input id="bz-price" type="number" min="0" value="129"></div>
+          <div><label for="bz-setup">דמי הקמה ממוצעים (₪)</label><input id="bz-setup" type="number" min="0" value="250"></div>
+          <div><label for="bz-free">חודשי ניסיון חינם</label><input id="bz-free" type="number" min="0" max="6" value="1"></div>
+          <div><label for="bz-churn">נטישה חודשית (%)</label><input id="bz-churn" type="number" min="0" max="50" step="0.5" value="3"></div>
+          <div><label for="bz-close">יחס סגירה מביקורי דוגמה (%)</label><input id="bz-close" type="number" min="1" max="100" value="25"></div>
+          <div><label for="bz-tags">תגים ללקוח</label><input id="bz-tags" type="number" min="1" value="16"></div>
+          <div><label for="bz-loss">אובדן תגים בשנה (%)</label><input id="bz-loss" type="number" min="0" max="100" value="20"></div>
+          <div><label for="bz-unit">עלות תג בכסף (₪)</label><input id="bz-unit" type="number" min="0" step="0.5" value="9"></div>
+          <div><label for="bz-umin">דקות עבודה לתג</label><input id="bz-umin" type="number" min="0" value="5"></div>
+          <div><label for="bz-hourly">שווי שעה של אדם (₪)</label><input id="bz-hourly" type="number" min="0" value="50"></div>
+          <div><label for="bz-fixed">הוצאות קבועות בחודש (₪)</label><input id="bz-fixed" type="number" min="0" value="450"></div>
+        </div>
+        <div class="out" aria-live="polite">
+          <div><b id="bz-o-active">–</b><span>לקוחות פעילים בחודש 12</span></div>
+          <div><b id="bz-o-mrr">–</b><span>הכנסה חודשית קבועה בחודש 12</span></div>
+          <div><b id="bz-o-cash">–</b><span>רווח תזרימי בחודש 12</span></div>
+          <div><b id="bz-o-hours">–</b><span>שעות עבודה בחודש 12</span></div>
+          <div><b id="bz-o-eff">–</b><span>שכר שעתי אפקטיבי בחודש 12</span></div>
+          <div><b id="bz-o-be">–</b><span>נקודת איזון תזרימית (לקוחות משלמים)</span></div>
+          <div><b id="bz-o-pb">–</b><span>החזר עלות לקוח, כולל זמן (חודשים)</span></div>
+          <div><b id="bz-o-cum">–</b><span>רווח תזרימי מצטבר, שנה 1</span></div>
+        </div>
+        <p class="foot">קבועים במחשבון: ביקור דוגמה 65 דקות, 12 ₪ לסטנד דוגמה ו-15 ₪ דלק. התקנה 90 דקות. תמיכה 20 דקות ללקוח בחודש. עמלת סליקה 2%. החלפות בדואר, פעמיים בשנה. כל אלה הערכות<i class="k e">הערכה</i>. "רווח תזרימי" לא כולל את זמנו של אדם. "שכר שעתי אפקטיבי" הוא הרווח התזרימי חלקי השעות.</p>
+        <p class="foot"><button type="button" id="bz-reset">חזרה לתרחיש הבסיס</button></p>
+      </div>
+
+      <h3>תרחיש הבסיס לאורך 3 שנים</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>חודש</th><th class="num">לקוחות פעילים</th><th class="num">הכנסה חודשית קבועה</th><th class="num">רווח תזרימי בחודש</th><th class="num">שעות בחודש</th><th class="num">שכר שעתי אפקטיבי</th></tr></thead>
+        <tbody>
+          <tr><td>12</td><td class="num">36</td><td class="num">4,156 ₪</td><td class="num">3,258 ₪</td><td class="num">39</td><td class="num">83 ₪</td></tr>
+          <tr><td>24</td><td class="num">61</td><td class="num">7,353 ₪</td><td class="num">6,178 ₪</td><td class="num">49</td><td class="num">126 ₪</td></tr>
+          <tr><td>36</td><td class="num">78</td><td class="num">9,571 ₪</td><td class="num">8,205 ₪</td><td class="num">56</td><td class="num">147 ₪</td></tr>
+        </tbody>
+      </table></div>
+      <p class="small">3.5 לקוחות חדשים בחודש, מנוי ממוצע של 129 ₪, נטישה של 3% בחודש<i class="k e">הערכה</i>. בקצב של 2 בחודש: 44 לקוחות ו-5,469 ₪ בחודש 36. בקצב של 5 בחודש: 111 לקוחות ו-13,673 ₪. מעל תקרת עוסק פטור (122,833 ₪ בשנה) עוברים לעוסק מורשה. בקצב הגבוה זה קורה בשנה השלישית.</p>
+
+      <div class="chart" id="tn-chart">
+        <h4>מה באמת משפיע על הרווח</h4>
+        <p class="sub">הפער ברווח התזרימי המצטבר אחרי 24 חודשים, בין הערך הגרוע לטוב של כל הנחה. כל השאר נשאר בתרחיש הבסיס (76,596 ₪).</p>
+        <div class="rb" id="tn-rows"></div>
+        <div class="tip" id="tn-tip" hidden></div>
+      </div>
+      <p><strong>מה זה אומר לאדם:</strong> את הזמן הפנוי משקיעים במכירה ובהוכחת ערך, שמצדיקה מחיר, ולא בשיפור הסטנד. אובדן ובלאי הם הגורם הקטן ברשימה, בתנאי שההחלפות נשלחות בדואר ויש להן תקרה. ויתור על דמי ההקמה עולה יותר מכל הגניבות יחד.</p>
+    </section>
+
+    <section id="bold">
+      <h2><span class="n">11</span>זוויות פורצות דרך</h2>
+      <h3>1. הספק משלם, לא בית הקפה</h3>
+      <p>קולות קפה, יבואני בירה וחברות משקאות כבר נותנים לבתי קפה שמשיות, תפריטים ותחתיות עם הלוגו שלהם. ההצעה: ספק מממן את הסטנדים ואת המנוי ברשת הלקוחות שלו. בתמורה הוא מקבל פס מיתוג קטן על הסטנד, שורה בדף ("בחסות...") ודוח חודשי של חשיפות לפי בית קפה. זה פריט נקודת המכירה הראשון שהספק יכול למדוד.</p>
+      <ul>
+        <li><strong>למה זה פורץ דרך:</strong> זה הופך את בעיית הנכונות לשלם. בית הקפה מקבל חינם, ולאדם יש לקוח אחד שמביא עשרות בתי עסק ביום אחד.</li>
+        <li><strong>מה יכול להשתבש:</strong> בעלי בתי קפה שלא ירצו מותג של ספק על השולחן. ספק שידרוש בלעדיות. ותלות בלקוח אחד גדול.</li>
+        <li><strong>איך בודקים בזול:</strong> שתי שיחות עם קלייה מקומית או מפיץ בירה, עם נתוני פיילוט ביד<i class="k h">לבדיקה</i>. לא לפני שיש נתונים.</li>
+      </ul>
+      <h3>2. לא להוסיף חפץ לשולחן, לשדרג חפץ שכבר עליו</h3>
+      <p>בעלי בתי קפה לא אוהבים עומס על השולחן, ולקוחות אוהבים לקחת הביתה חפצים ממותגים. רשת ווטאבורגר בארה״ב החליפה ב-2019 מיליון שלטי שולחן שנגנבו<i class="k v">מאומת</i>. הפתרון: להטמיע את התג בחפץ שממילא צריך להיות על השולחן, כמו מחזיק מפיות, מעמד סוכר או מספר שולחן. זה פונקציונלי, קשה יותר "לשכוח בתיק", ובעל הבית חוסך קנייה שהיה עושה בכל מקרה.</p>
+      <h3>3. דף נגיש ורב לשוני כברירת מחדל</h3>
+      <p>דף הלקוח מזהה את שפת הטלפון ונפתח בעברית, באנגלית, ברוסית או בערבית. זה יתרון באזורי תיירות. בנוסף, דף שבנוי לפי תקן הנגישות הישראלי (ת״י 5568) הוא נקודת מכירה, כי עסקים קטנים חשופים לתביעות נגישות על אתרים. צריך לבדוק אם התקנות חלות על דף כזה ועל עסק בגודל הזה<i class="k h">לבדיקה</i>.</p>
+    </section>
+
+    <section id="gates">
+      <h2><span class="n">12</span>60 הימים הראשונים ושערי החלטה</h2>
+      <div class="phase">
+        <h3>ימים 1-14: לבנות את המינימום שמוכר</h3>
+        <div class="when">שבוע בית אחד ושבוע בסיס אחד</div>
+        <ul>
+          <li>דגם סטנד עם כיס לצ׳יפ בגב, בלי עצירה באמצע ההדפסה (פרק 8). בדיקת קריאה באייפון ובאנדרואיד, על עץ ועל מתכת.</li>
+          <li>הפניה, דף לקוח עם שישה כפתורים, ולוח חי פשוט בדפדפן.</li>
+          <li>שלושה עסקי פיילוט מהרשת החמה. ביום הראשון מתעדים ספירת ביקורות ב-90 הימים האחרונים. זה קו הבסיס.</li>
+        </ul>
+      </div>
+      <div class="phase">
+        <h3>ימים 15-45: שלושה פיילוטים, חודש חינם</h3>
+        <ul>
+          <li>מודדים כל יום: סריקות לשולחן, קריאות, דיווחי "לא בסדר", זמן תגובה, ביקורות חדשות.</li>
+          <li>באמצע החודש שואלים את בעל הבית שאלה אחת: "אם זה ייעלם מחר, מה יחסר לך?"</li>
+          <li>ביום 30 מבקשים תשלום לפי המדרגה. בפיילוט אחד מציעים מחיר אחר, כדי ללמוד על הרגישות למחיר.</li>
+        </ul>
+      </div>
+      <div class="phase">
+        <h3>ימים 30-60: "הדוגמה עם הלוגו שלהם", ברחוב אחד</h3>
+        <ul>
+          <li>20 סטנדי דוגמה ברחוב או מתחם אחד במרכז, עם צילום מסך אמיתי של הלוח מהפיילוט.</li>
+          <li>יעד ריאלי לאדם, עם שבוע בבסיס ושבוע בבית: 3-5 לקוחות חדשים בחודש, ולא 8-12 כמו בגרסה 1. בחישוב שעות, 10 ביקורי דוגמה בשבוע הם כ-11 שעות, וזה אפשרי רק בשבועות הבית.</li>
+        </ul>
+      </div>
+      <h3>השער ביום 60</h3>
+      <div class="gates">
+        <div class="gate"><h4>נכונות לשלם</h4><div class="t">2 מתוך 3</div><p>פיילוטים שממשיכים בתשלום של 89 ₪ ומעלה. זה המדד החשוב ביותר.</p></div>
+        <div class="gate"><h4>שימוש</h4><div class="t">0.5 ומעלה</div><p>סריקות לשולחן ביום, בממוצע. פחות מזה: לבדוק מיקום, עיצוב ומשפט הנעה, לפני שמוותרים.</p></div>
+        <div class="gate"><h4>ערוץ חי</h4><div class="t">1 ומעלה</div><p>אירוע (קריאה או דיווח) לשולחן בשבוע, או בעל בית שאומר שהוא מסתכל בלוח כל יום.</p></div>
+        <div class="gate"><h4>סגירה ברחוב</h4><div class="t">15% ומעלה</div><p>מסטנדי הדוגמה הופכים ללקוחות משלמים.</p></div>
+      </div>
+      <ul>
+        <li><strong>עוברים את כולם:</strong> מגבירים. שוקלים מדפסת שנייה או ייצור בצד ג׳, ופונים לספק ראשון.</li>
+        <li><strong>יש שימוש אבל אין תשלום:</strong> הבעיה היא בערך או במחיר, לא במוצר. בודקים את מדרגת 89 ₪ ואת "תג בלבד".</li>
+        <li><strong>אין שימוש:</strong> עוצרים לפני שמשקיעים עוד. אפשר לחזור לתגים חד פעמיים לעסקים שאינם מסעדות (מספרות, סטודיו), שם גם גרסה 1 מתאימה.</li>
+      </ul>
+    </section>
+
+    <section id="keep">
+      <h2><span class="n">13</span>מה נשאר כמו בגרסה 1</h2>
+      <p>רוב הפרקים הטכניים בגרסה 1 מדויקים ונשארים בתוקף, עם העדכונים האלה:</p>
+      <ul>
+        <li><strong>הצ׳יפ:</strong> NTAG213 עגול 25 מ״מ, נעול לצמיתות, שמפנה לכתובת של אדם. זה נכון, וגם מונע את מה שקרה במקדונלד׳ס באוסטרליה ובניו זילנד. שם תגים שנשארו פתוחים לכתיבה שוכתבו על ידי לקוחות לקישורים אחרים<i class="k v">מאומת</i>.</li>
+        <li><strong>שולחנות מתכת:</strong> בדיקה על השולחן האמיתי לפני ייצור. בכיס בגב, הצ׳יפ נמצא בחלק האנכי של הסטנד, גבוה מהמשטח.</li>
+        <li><strong>QR לצד NFC:</strong> חובה. עדיף QR מוטבע בהדפסה או מתחת לשכבת למינציה, ולא מדבקה שקל להדביק עליה אחרת. ה-FBI הזהיר מפני קודי QR מזויפים שמודבקים כמדבקה מעל הקוד המקורי<i class="k v">מאומת</i>.</li>
+        <li><strong>עיצוב:</strong> CAD לבסיס, Meshy לקישוט, ורישיון בתשלום לעבודה מסחרית. בלי שינוי.</li>
+        <li><strong>התוכנה:</strong> Next.js, Supabase ודומיין קצר. בלי שינוי, חוץ מסדר הבנייה (פרק 6).</li>
+        <li><strong>התסריט "הכנתי לך אחד עם הלוגו":</strong> נשאר בלב המכירה. המשפט השני משתנה ל: "ומה שאף אחד לא נותן לך: אתה תדע על בעיה כשהלקוח עוד יושב."</li>
+      </ul>
+    </section>
+
+    <section id="legal">
+      <h2><span class="n">14</span>חוק ומדיניות: תוספות לגרסה 1</h2>
+      <ul>
+        <li><strong>גוגל, עדכון אפריל 2026:</strong> אסור לקבוע לצוות מכסות ביקורות, ואסור לבקש תוכן שמזהה עובד<i class="k v">מאומת</i>. לכן אין בדף שאלה כמו "מי שירת אותך?" ליד כפתור הביקורת. גוגל גם מזהה "נפחים או דפוסים חריגים" של ביקורות<i class="k v">מאומת</i>. קפיצה חדה ביום אחד יכולה להיראות חשודה. זו עוד סיבה לא לדחוף.</li>
+        <li><strong>שני כפתורים באותו מסך:</strong> המדיניות לא אוסרת במפורש להציע גם ערוץ פרטי. היא אוסרת לבקש ביקורות באופן סלקטיבי ולהרתיע ביקורות שליליות<i class="k v">מאומת</i>. מסך שבו כולם רואים את שני הכפתורים יחד, בלי שאלה מקדימה, עומד בנוסח. מסך שמסווג לפי דירוג לא עומד בו<i class="k e">הערכה</i>.</li>
+        <li><strong>פרטיות:</strong> כברירת מחדל לא אוספים שום מידע מזהה. אם בעתיד מוסיפים "הצטרפות למועדון" עם טלפון, העסק הוא בעל המאגר ואדם הוא מחזיק עבורו. אז נדרשים הסכם עיבוד ועמידה בתקנות אבטחת מידע, במיוחד מאז תיקון 13 לחוק הגנת הפרטיות<i class="k h">לבדיקה</i>. וכל דיוור שיווקי דורש הסכמה מפורשת לפי חוק התקשורת (סעיף 30א).</li>
+        <li><strong>טקסט חופשי בדיווח "לא בסדר":</strong> לקוחות עלולים לכתוב שם או טלפון. כדאי לשמור את הטקסט זמן מוגבל (למשל 90 יום) ולציין את זה בדף.</li>
+        <li><strong>שירות צבאי:</strong> נשאר כמו בגרסה 1. אישור לעבודה נוספת לפני שפותחים עוסק וגובים כסף.</li>
+      </ul>
+    </section>
+
+    <section id="risks">
+      <h2><span class="n">15</span>סיכונים מעודכנים</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>סיכון</th><th>סבירות</th><th>מה עושים</th></tr></thead>
+        <tbody>
+          <tr><td>בעלי עסקים לא משלמים מעל 89-99 ₪ כי יש חלופות</td><td>גבוהה</td><td>הערוץ החי כבידול, מדרגה של 89 ₪, ושער החלטה ביום 60</td></tr>
+          <tr><td>צוות לא מגיב לקריאות, והלקוח מאוכזב פעמיים</td><td>בינונית</td><td>להתחיל עם "משהו לא בסדר" למנהל בלבד. קריאה לצוות רק בעסק שמוכן לזה. ולהציג בדוח את זמן התגובה</td></tr>
+          <tr><td>זמן: שבוע בבסיס, שבוע בבית</td><td>גבוהה</td><td>כיס לצ׳יפ בגב כדי שהמדפסת תעבוד בלי אדם, החלפות בדואר, תוכנה שעובדת לבד</td></tr>
+          <tr><td>גניבה ובלאי מעל ההנחה</td><td>בינונית</td><td>תקרה להחלפות, דבק או משקולת בבסיס, השתלבות בחפץ שכבר על השולחן</td></tr>
+          <tr><td>לקוחות נסגרים (הענף בסיכון הגבוה ביותר לפי CofaceBdi)<i class="k v">מאומת</i></td><td>גבוהה</td><td>תשלום שנתי מראש לעסקים חדשים, דמי הקמה שמכסים את החומרה</td></tr>
+          <tr><td>גוגל מקפיאה שוב ביקורות בישראל</td><td>נמוכה-בינונית</td><td>הערך המרכזי הוא הערוץ החי, והוא לא תלוי בגוגל</td></tr>
+          <tr><td>מתחרה תוכנה מוסיף "משהו לא בסדר" בחודש</td><td>בינונית</td><td>לנצח במקומי: חפץ, התקנה, צפיפות ברחוב, קשר אישי והיסטוריית נתונים</td></tr>
+          <tr><td>PLA מתעקם בחוץ בקיץ</td><td>גבוהה, אם לא מטפלים</td><td>PETG או ASA לכל שולחן בחוץ, כולל מרפסות מוצלות (פרק 9)</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section id="sources">
+      <h2><span class="n">16</span>מקורות</h2>
+      <ul class="src">
+        <li>הלמ״ס, דמוגרפיה של עסקים 2023, לוח 4 (ענף 56, שירותי אוכל ומשקאות): <a href="https://www.cbs.gov.il/he/publications/doclib/2024/business_demo2023/t4_2023.pdf">cbs.gov.il</a></li>
+        <li>מרכז המחקר והמידע של הכנסת, ענף המסעדנות (2023), כולל שיעורי שרידות ופילוח עוסקים: <a href="https://fs.knesset.gov.il/globaldocs/MMM/c5501278-cf1b-ee11-8159-005056aac6c3/2_c5501278-cf1b-ee11-8159-005056aac6c3_11_20235.pdf">knesset.gov.il</a>, <a href="https://fs.knesset.gov.il/globaldocs/MMM/ad6da6f3-c7ff-ed11-815c-005056aa4246/2_ad6da6f3-c7ff-ed11-815c-005056aa4246_11_20240.pdf">knesset.gov.il</a></li>
+        <li>כלכליסט, אונטופו: כ-2,000 מסעדות שירות מלא, 1,200 אצלה (מאי 2025): <a href="https://www.calcalist.co.il/shopping/article/ryahnx1111ex">calcalist.co.il</a></li>
+        <li>גלובס, וולט: כ-6,500 מסעדות בישראל (ינואר 2025): <a href="https://www.globes.co.il/news/article.aspx?did=1001499833">globes.co.il</a></li>
+        <li>D&amp;B דרך N12, סגירות מסעדות ב-2025: <a href="https://www.mako.co.il/finances-news/Article-3001e99a98e3c91026.htm">mako.co.il</a>. N12, מניין סניפי רשתות המבורגר (ספטמבר 2026): <a href="https://www.mako.co.il/news-money/consumer/Article-5c12ecb39d7c0a1027.htm">mako.co.il</a></li>
+        <li>כלכליסט, מודל כלכלי של בית קפה (מחזור, עלות מזון, עבודה, שכירות): <a href="https://www.calcalist.co.il/local/articles/0,7340,L-3760708,00.html">calcalist.co.il</a></li>
+        <li>TapReview: <a href="https://www.tap-review.co.il/">tap-review.co.il</a> · TapTap: <a href="https://taptap.co.il/">taptap.co.il</a> · Vino: <a href="https://vino-smart.com/he/features/">vino-smart.com</a> · Hopa: <a href="https://hopa.digital/menu">hopa.digital</a> · Algora: <a href="https://algora.co.il/">algora.co.il</a> · Be5: <a href="https://be5.co.il/">be5.co.il</a></li>
+        <li>Tattle, מחירים: <a href="https://get.tattleapp.com/pricing">tattleapp.com</a> · Ovation: <a href="https://ovationup.com/">ovationup.com</a> · TapFive: <a href="https://shop.tapfive.com/pages/tapfive-google-review-stand">tapfive.com</a></li>
+        <li>Luca, "Reviews, Reputation, and Revenue", HBS 12-016: <a href="https://www.hbs.edu/ris/Publication%20Files/12-016_a7e4a5a2-03f9-490d-b093-8f951238dba2.pdf">hbs.edu</a> · Anderson &amp; Magruder, Economic Journal 2012: <a href="https://anderson.are.berkeley.edu/pdf/Anderson%20and%20Magruder%202012.pdf">berkeley.edu</a></li>
+        <li>BrightLocal, Local Consumer Review Survey 2026: <a href="https://www.brightlocal.com/research/local-consumer-review-survey/">brightlocal.com</a></li>
+        <li>Google, מדיניות תוכן אסור ומוגבל במפות: <a href="https://support.google.com/contributionpolicy/answer/7400114">support.google.com</a> · עדכון אפריל 2026: <a href="https://ppc.land/google-tightens-maps-review-policy-staff-names-and-quotas-now-banned/">ppc.land</a></li>
+        <li>mako, חזרת הביקורות בגוגל לעסקים בישראל (2024): <a href="https://www.mako.co.il/food-restaurants/restaurant-news/Article-900cd87377ad091026.htm">mako.co.il</a></li>
+        <li>ווטאבורגר ושלטי השולחן: <a href="https://kvia.com/news/business-technology/2019/11/25/whataburger-spending-200000-this-year-to-replace-1-million-stolen-table-tents/">kvia.com</a> · תגי NFC פתוחים במקדונלד׳ס: <a href="https://www.theregister.com/2016/06/20/filetophish_insecure_nfc_tag_relics_hidden_under_maccas_tables">theregister.com</a></li>
+        <li>Craftcloud, הצעות מחיר חיות לדגם סטנד בדיקה (27.9.2026), משלוח לישראל: <a href="https://craftcloud3d.com/">craftcloud3d.com</a> · JLC3DP: <a href="https://jlc3dp.com/help/article/pla-plastic">jlc3dp.com</a></li>
+        <li>מכוני הדפסה בישראל: <a href="https://onelogiclab.com/en/3d-printing/">One Logic Lab</a>, <a href="https://www.indus3design.com/3d-printing-cost/">Indus3D</a>, <a href="https://www.ani-mator.com/3d-print/">IAC</a>, <a href="https://memad4u.com/">המימד הרביעי</a>, <a href="https://3dprintorel.co.il/3d-printing-price/">3D Print Orel</a></li>
+        <li>אקריליק עם NFC מסין (Alibaba): <a href="https://www.alibaba.com/product-detail/Custom-NFC-Display-Stand-Hub-QR_1600494709965.html">alibaba.com</a> · עלויות תבנית יציקה: <a href="https://www.haizol.com/blog/injection-molding-tooling-cost-china">Haizol</a>, <a href="https://ati-propel.co.il/injection-molding-vs-3d-printing-mass-production-break-even/">ATI-Propel</a></li>
+        <li>פטור ממע״מ ביבוא אישי חזר ל-75 דולר (יוני 2026): <a href="https://www.timesofisrael.com/knesset-revokes-smotrichs-order-expanding-personal-import-tax-exemption-to-130/">timesofisrael.com</a></li>
+        <li>NXP, גיליון נתונים NTAG213/215/216: <a href="https://www.nxp.com/docs/en/data-sheet/NTAG213_215_216.pdf">nxp.com</a> · מחירי צ׳יפים: <a href="https://shopnfc.com/en/30-ntag213">Shop NFC</a>, <a href="https://store.gototags.com/nfc-sticker-ntag213-25-mm-circle/">GoToTags</a> · NFC על מתכת: <a href="https://seritag.com/learn/using-nfc/on-metal-nfc-tags">Seritag</a> · עובי פלסטיק מעל הצ׳יפ: <a href="https://printpal.io/resources/how-to-use-nfc-tags-in-3d-prints">PrintPal</a></li>
+        <li>גיליונות נתונים של Bambu: <a href="https://wiki.bambulab.com/filament-acc/abs-asa-pc/bambu_pla_basic_technical_data_sheet.pdf">PLA</a>, <a href="https://store.bblcdn.com/s1/default/cb94589bf7994fdcbfa833badefae9cd/Bambu_PETG_Basic_Technical_Data_Sheet.pdf">PETG</a>, <a href="https://wiki.bambulab.com/filament-acc/abs-asa-pc/6eaf4c432d1d4014a1975e55a55ed00b.pdf">ASA</a> · עמידות לחומרי ניקוי: <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12196949/">Kaptan 2025, Polymers</a> · שיעורי כשל הדפסה: <a href="https://print-calc.com/blog/3d-printing-failure-rate">print-calc</a></li>
+        <li>טמפרטורת לוח מחוונים בשמש: <a href="https://cars.walla.co.il/item/3161174">walla.co.il</a> · מחיר חשמל יולי 2026: <a href="https://www.chashmalink.com/cost-kwh">chashmalink.com</a> · פילמנט בישראל: <a href="https://www.3dbotx.co.il/product-page/bambu-lab-pla-basic-bambu-green">3DbotX</a></li>
+        <li>אזהרת FBI על קודי QR מזויפים: <a href="https://www.ic3.gov/PSA/2022/PSA220118">ic3.gov</a></li>
+        <li>גרסה 1 של התוכנית, שכל העבודה הזו נבנתה עליה: "תג אחד על השולחן" מאת אדם.</li>
+      </ul>
+    </section>
+
+    <footer>נכתב על בסיס התוכנית של אדם, הערות מהבית ומחקר שוק (ספטמבר 2026). כל מספר מסומן כמאומת, כהערכה או כהשערה לבדיקה. את ההערכות צריך להחליף בנתוני פיילוט ברגע שיש כאלה.</footer>
+  </main>
+</div>
+</div>
+
+<script>
+document.documentElement.lang='he';document.documentElement.dir='rtl';
+(function(){
+  const $=id=>document.getElementById(id);
+  const num=id=>{const v=parseFloat($(id).value);return isFinite(v)?v:0};
+  const ils=n=>Math.round(n).toLocaleString('he-IL')+' ₪';
+  function band(t){ if(t<=14) return 89; if(t<=24) return 149; if(t<=34) return 199; return 199+6*(t-34); }
+  function ov(){
+    const t=Math.max(1,num('ov-tables')), covers=t*num('ov-turns')*num('ov-days');
+    const rev=covers*num('ov-check');
+    const extra=covers*num('ov-extra')/100*num('ov-item')*num('ov-gm')/100;
+    const rec=covers*num('ov-issue')/100*(1/3)*num('ov-saved');
+    const val=extra+rec, price=band(t);
+    $('ov-o-rev').textContent=ils(rev);
+    $('ov-o-val').textContent=ils(val);
+    $('ov-o-range').textContent=Math.round(val*0.1)+'-'+Math.round(val*0.2)+' ₪';
+    $('ov-o-roi').textContent=(price>0?(val/price).toFixed(1):'–')+'x · '+price+' ₪';
+  }
+  ['ov-tables','ov-turns','ov-days','ov-check','ov-gm','ov-extra','ov-item','ov-issue','ov-saved'].forEach(i=>$(i).addEventListener('input',ov));
+  ov();
+})();
+
+(function(){
+  const $=id=>document.getElementById(id);
+  const ils=n=>Math.round(n).toLocaleString('he-IL')+' ₪';
+  const tip=(box,t)=>({show(el,ev,title,val){t.textContent='';const b=document.createElement('b');b.textContent=val;const s=document.createElement('span');s.textContent=title;t.append(b,s);t.hidden=false;const r=box.getBoundingClientRect();let x,y;if(ev&&ev.clientX!=null){x=ev.clientX-r.left;y=ev.clientY-r.top}else{const e=el.getBoundingClientRect();x=e.left-r.left+e.width/2;y=e.top-r.top}const w=t.offsetWidth;t.style.left=Math.min(Math.max(8,x-w/2),r.width-w-8)+'px';t.style.top=(y-t.offsetHeight-12)+'px'},hide(){t.hidden=true}});
+  function mkBar(track,cls,lo,hi,max,label,title,T){
+    const b=document.createElement('div');b.className='rb-bar '+cls;b.tabIndex=0;
+    b.style.insetInlineStart=(lo/max*100)+'%';b.style.width=((hi-lo)/max*100)+'%';
+    b.setAttribute('role','img');b.setAttribute('aria-label',title+': '+label);
+    b.addEventListener('pointermove',e=>T.show(b,e,title,label));b.addEventListener('pointerleave',()=>T.hide());
+    b.addEventListener('focus',()=>T.show(b,null,title,label));b.addEventListener('blur',()=>T.hide());
+    track.append(b);
+    const v=document.createElement('span');v.className='rb-val '+cls;v.textContent=label;
+    if(lo>0&&hi/max>0.72){v.style.insetInlineEnd='calc('+(100-lo/max*100)+'% + 6px)'}else{v.style.insetInlineStart='calc('+(hi/max*100)+'% + 6px)'}
+    track.append(v);
+  }
+  function axis(host,ticks,max,fmt){
+    const a=document.createElement('div');a.className='rb-axis';a.append(document.createElement('span'));
+    const t=document.createElement('div');t.className='rb-ticks';
+    ticks.forEach((v,i)=>{const s=document.createElement('span');s.textContent=fmt(v);s.style.insetInlineStart=(v/max*100)+'%';if(i===0)s.className='first';if(i===ticks.length-1)s.className='last';t.append(s)});
+    a.append(t);host.after(a);
+  }
+  // make-vs-buy ranges
+  const MK=[['הדפסה ביתית, כסף בלבד',[8,9],[5,6.5]],['הדפסה ביתית, כולל זמן עבודה',[13,14],[9,10.5]],['FDM בחו״ל, כולל שילוח ומכס',[12,15],[8,10]],['אקריליק עם UV מסין',[14,17],[11,13]],['מכון הדפסה בישראל',[30,70],[20,45]]];
+  const mkRows=$('mk-rows'),mkT=tip($('mk-chart'),$('mk-tip'));
+  if(mkRows){
+    const f=r=>r[0]+'-'+r[1]+' ₪';
+    MK.forEach(([name,a,b])=>{const row=document.createElement('div');row.className='rb-row';const n=document.createElement('div');n.className='rb-name';n.textContent=name;const tr=document.createElement('div');tr.className='rb-track';
+      mkBar(tr,'a',a[0],a[1],80,f(a),name+' · 100 יח׳',mkT);mkBar(tr,'b',b[0],b[1],80,f(b),name+' · 500 יח׳',mkT);row.append(n,tr);mkRows.append(row)});
+    $('mk-axis').remove();
+    axis(mkRows,[0,10,20,30,40,50,60,70,80],80,v=>v===0?'0':v+' ₪');
+  }
+  // tornado: swing in 24-month cumulative cash
+  const TN=[['קצב לקוחות חדשים (2 עד 5 בחודש)',74911],['מנוי ממוצע (99 עד 169 ₪)',52122],['דמי הקמה (0 עד 390 ₪)',32760],['חודשי ניסיון (2 עד 0)',20491],['נטישה חודשית (5% עד 2%)',19678],['עלות תג (14 עד 6 ₪)',12552],['יחס סגירה (15% עד 35%)',8640],['גניבה ובלאי (40% עד 10% בשנה)',3038,1]];
+  const tnRows=$('tn-rows'),tnT=tip($('tn-chart'),$('tn-tip'));
+  if(tnRows){
+    TN.forEach(([name,v,hl])=>{const row=document.createElement('div');row.className='rb-row';const n=document.createElement('div');n.className='rb-name';n.textContent=name;const tr=document.createElement('div');tr.className='rb-track one';
+      mkBar(tr,hl?'hl':'',0,v,100000,ils(v),name,tnT);row.append(n,tr);tnRows.append(row)});
+    axis(tnRows,[0,25000,50000,75000,100000],100000,v=>v===0?'0':(v/1000)+' אלף ₪');
+  }
+  // business calculator (mirrors the model used for the tables above)
+  const C={DEMO:12,FUEL:15,VISIT:65,INSTALL:90,SUPPORT:20,MAIL:25,MAILS:2,PROC:0.02,HOST:2};
+  const F=['new','price','setup','free','churn','close','tags','loss','unit','umin','hourly','fixed'];
+  const D={new:3.5,price:129,setup:250,free:1,churn:3,close:25,tags:16,loss:20,unit:9,umin:5,hourly:50,fixed:450};
+  const g=k=>{const v=parseFloat($('bz-'+k).value);return isFinite(v)?v:0};
+  function bz(){
+    const p={};F.forEach(k=>p[k]=g(k));p.close=Math.max(1,p.close);
+    const replUnits=p.tags*p.loss/100/12;
+    const replCash=replUnits*p.unit+C.MAIL*C.MAILS/12;
+    const hoursM=replUnits*p.umin/60+C.MAILS/12*0.25+C.SUPPORT/60;
+    const cashC=p.price*(1-C.PROC)-replCash-C.HOST;
+    const econC=cashC-hoursM*p.hourly;
+    const visits=100/p.close;
+    const acqH=visits*C.VISIT/60, onbH=(p.tags*p.umin+C.INSTALL)/60;
+    const cacCash=visits*(C.DEMO+C.FUEL)+p.tags*p.unit+C.FUEL-p.setup;
+    const cacEcon=cacCash+(acqH+onbH)*p.hourly;
+    let cohorts=[],cum=0,active=0,paying=0,cash=0,hours=0;
+    for(let m=1;m<=12;m++){
+      cohorts.forEach(c=>{c.n*=(1-p.churn/100);c.age++});
+      cohorts.push({n:p.new,age:0});
+      active=cohorts.reduce((s,c)=>s+c.n,0);
+      paying=cohorts.reduce((s,c)=>s+(c.age>=p.free?c.n:0),0);
+      cash=paying*p.price*(1-C.PROC)-active*(replCash+C.HOST)-p.new*cacCash-p.fixed;
+      hours=active*hoursM+p.new*(acqH+onbH);
+      cum+=cash;
+    }
+    $('bz-o-active').textContent=Math.round(active).toLocaleString('he-IL');
+    $('bz-o-mrr').textContent=ils(paying*p.price);
+    $('bz-o-cash').textContent=ils(cash);
+    $('bz-o-hours').textContent=Math.round(hours).toLocaleString('he-IL');
+    $('bz-o-eff').textContent=hours>0?ils(cash/hours):'–';
+    $('bz-o-be').textContent=cashC>0?(p.fixed/cashC).toFixed(1):'לא מתאזן';
+    $('bz-o-pb').textContent=econC>0?(cacEcon/econC+p.free).toFixed(1):'לא מחזיר';
+    $('bz-o-cum').textContent=ils(cum);
+  }
+  if($('bz')){
+    F.forEach(k=>$('bz-'+k).addEventListener('input',bz));
+    $('bz-reset').addEventListener('click',()=>{F.forEach(k=>$('bz-'+k).value=D[k]);bz()});
+    bz();
+  }
+})();
+</script>
