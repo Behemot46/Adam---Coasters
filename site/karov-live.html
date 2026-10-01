@@ -1,0 +1,1258 @@
+<title>קרוב לייב</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Secular+One&family=Assistant:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<style>
+/* Layout: one app, four views on hash anchors. Demo = diner phone beside the staff board; board = floor map + thermal tickets; report = filter row, stat tiles, charts, pilot gates; setup = form beside a live preview, then QR labels. #t7 / #q7 open a bare diner page. RTL. */
+:root{
+  --bg:#F2F5F3;        /* cool laminate table */
+  --surface:#FFFFFF;
+  --ink:#16201C;
+  --muted:#56645E;
+  --line:#D3DCD7;
+  --grid:#E3E9E6;
+  --teal:#0F5C4A;      /* Karov brand */
+  --teal-ink:#FFFFFF;
+  --teal-soft:#DCEBE5;
+  --yolk:#F2C14E;      /* "new" signal */
+  --yolk-ink:#3A2B00;
+  --yolk-soft:#FBEFC9;
+  --ticket:#FFFDF6;    /* thermal paper */
+  --alert:#B23A2A;
+  --alert-ink:#FFFFFF;
+  --chart:#1F7A60;
+  --chart-hi:#0F5C4A;
+  --st-good:#0CA30C;
+  --st-warn:#E39A00;
+  --plate:#FFFFFF;     /* logo plate, same in both themes */
+  --shadow:rgb(22 32 28 / .16);
+  --scrim:rgb(22 32 28 / .40);
+  --lift:0%;           /* how much a venue color is lightened on dark grounds */
+  --display:"Secular One","Assistant","Arial Hebrew",Arial,sans-serif;
+  --body:"Assistant","Heebo","Segoe UI",Arial,sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F1513; --surface:#18211D; --ink:#E6EEEA; --muted:#9AABA3; --line:#2B3833; --grid:#222D29;
+    --teal:#4FB394; --teal-ink:#0B1411; --teal-soft:#1B3029; --yolk:#E9B949; --yolk-ink:#2E2200; --yolk-soft:#3A3320;
+    --ticket:#22201A; --alert:#E77B69; --alert-ink:#2A0D08; --chart:#4FB394; --chart-hi:#86D4B9;
+    --shadow:rgb(0 0 0 / .5); --scrim:rgb(0 0 0 / .6); --lift:42%; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F1513; --surface:#18211D; --ink:#E6EEEA; --muted:#9AABA3; --line:#2B3833; --grid:#222D29;
+  --teal:#4FB394; --teal-ink:#0B1411; --teal-soft:#1B3029; --yolk:#E9B949; --yolk-ink:#2E2200; --yolk-soft:#3A3320;
+  --ticket:#22201A; --alert:#E77B69; --alert-ink:#2A0D08; --chart:#4FB394; --chart-hi:#86D4B9;
+  --shadow:rgb(0 0 0 / .5); --scrim:rgb(0 0 0 / .6); --lift:42%; color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{direction:rtl;height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;min-height:100%}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--yolk);outline-offset:2px}
+h1,h2,h3,p{margin:0}
+h1,h2{font-family:var(--display);font-weight:400;line-height:1.15;text-wrap:balance}
+a{color:var(--teal)}
+
+/* app chrome */
+.app{max-width:1280px;margin:0 auto;padding-inline:20px;padding-block:0 48px}
+.bar{display:flex;align-items:center;gap:12px 18px;padding-block:14px;flex-wrap:wrap}
+.mark{display:flex;align-items:center;gap:8px;font-family:var(--display);font-size:1.45rem;line-height:1}
+.mark svg{width:26px;height:26px;color:var(--teal)}
+.mark small{font-family:var(--body);font-size:.8rem;font-weight:700;color:var(--muted);padding:2px 8px;border:1px solid var(--line);border-radius:999px}
+.tabs{display:flex;gap:2px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:4px;overflow-x:auto;max-width:100%}
+.tab{border:0;background:transparent;color:var(--muted);font-weight:700;font-size:.92rem;padding:6px 14px;border-radius:999px;white-space:nowrap}
+.tab[aria-current="page"]{background:var(--teal);color:var(--teal-ink)}
+.conn{margin-inline-start:auto;display:flex;align-items:center;gap:7px;font-size:.8rem;font-weight:700;padding:5px 11px;border-radius:999px;background:var(--surface);border:1px solid var(--line);white-space:nowrap}
+.conn i{width:8px;height:8px;border-radius:50%;background:var(--muted)}
+.conn.live i{background:var(--st-good);animation:blink 2s ease-in-out infinite}
+.conn.readonly i,.conn.local i{background:var(--st-warn)}
+.conn.offline i{background:var(--alert)}
+@keyframes blink{50%{opacity:.3}}
+.banner{display:flex;gap:10px;align-items:flex-start;background:var(--yolk-soft);color:var(--ink);border-radius:12px;padding:10px 14px;font-size:.92rem;margin-bottom:16px}
+.banner b{flex:none}
+.view{display:flex;flex-direction:column;gap:18px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;min-width:0}
+.card h2{font-size:1.35rem}
+.card h3{font-family:var(--body);font-weight:800;font-size:1.02rem;line-height:1.3}
+.sub{font-size:.85rem;color:var(--muted)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;font-weight:700;font-size:.92rem;padding:8px 16px;border-radius:999px;border:1.5px solid var(--teal);background:transparent;color:var(--teal);text-decoration:none;white-space:nowrap}
+.btn.solid{background:var(--teal);color:var(--teal-ink)}
+.btn.danger{border-color:var(--alert);color:var(--alert)}
+.btn.danger.solid{background:var(--alert);color:var(--alert-ink)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.toast{position:fixed;inset-inline:16px;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);margin-inline:auto;max-width:440px;background:var(--ink);color:var(--bg);border-radius:12px;padding:10px 14px;text-align:center;font-weight:600;font-size:.92rem;z-index:50;box-shadow:0 8px 24px var(--shadow)}
+
+/* demo hub */
+.intro{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:center}
+.intro h1{font-size:clamp(1.5rem,2.6vw,2rem)}
+.intro p{color:var(--muted);margin-top:6px;max-width:46em}
+.qrmini{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px;max-width:300px}
+.qrmini .qr{flex:none;border-radius:6px}
+.qrmini span{font-size:.85rem;font-weight:600;line-height:1.35}
+.hub{display:grid;grid-template-columns:350px minmax(0,1fr);gap:24px;align-items:start}
+.phonecol{position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px);display:flex;flex-direction:column;gap:10px;align-items:center}
+.seat{display:flex;align-items:center;gap:8px;font-size:.88rem;font-weight:700;color:var(--muted)}
+.seat button{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--line);background:var(--surface);font-weight:800;font-size:1.1rem;line-height:1}
+.seat b{font-family:var(--display);font-weight:400;font-size:1.5rem;color:var(--ink);min-width:2ch;text-align:center}
+.handset{background:var(--ink);border-radius:40px;padding:11px;width:100%;max-width:330px;box-shadow:0 18px 40px var(--shadow)}
+.handset .screen{background:var(--bg);border-radius:30px;overflow:hidden;height:640px;position:relative}
+.handset.small{max-width:290px}
+.handset.small .screen{height:560px}
+.caption{font-size:.8rem;color:var(--muted);text-align:center;max-width:320px}
+
+/* diner page */
+.d-shell{position:relative;height:100%}
+.d-shell.standalone{min-height:100vh;min-height:100dvh;height:auto;max-width:480px;margin-inline:auto}
+.diner{--brand:#0F5C4A;--brand-ink:#FFFFFF;--brand-line:color-mix(in oklab,var(--brand),#FFFFFF var(--lift));height:100%;overflow-y:auto;display:flex;flex-direction:column;background:var(--bg);color:var(--ink)}
+.standalone .diner{height:auto;min-height:100vh;min-height:100dvh;overflow:visible}
+.diner:lang(ar){font-family:"Noto Sans Arabic","Geeza Pro","Segoe UI",Tahoma,sans-serif}
+.diner:lang(ru),.diner:lang(en){font-family:"Assistant","Segoe UI",Roboto,Arial,sans-serif}
+.d-head{background:var(--brand);color:var(--brand-ink);padding:20px 16px 18px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;align-items:center}
+.d-logo{width:52px;height:52px;border-radius:50%;background:var(--brand-ink);color:var(--brand);display:grid;place-items:center;font-family:var(--display);font-size:1.25rem;overflow:hidden;grid-row:span 2}
+.d-logo.img{background:var(--plate)}
+.d-logo img{width:100%;height:100%;object-fit:contain}
+.d-name{font-family:var(--display);font-size:1.4rem;line-height:1.15;overflow-wrap:anywhere}
+.d-table{font-weight:700;font-size:.92rem;opacity:.92}
+.d-langs{grid-column:1/-1;display:flex;gap:6px;margin-top:10px}
+.d-lang{border:1px solid currentColor;background:transparent;color:inherit;border-radius:999px;padding:2px 10px;font-size:.78rem;font-weight:700;opacity:.72;min-height:28px}
+.d-lang[aria-pressed="true"]{background:var(--brand-ink);color:var(--brand);border-color:var(--brand-ink);opacity:1}
+.d-body{padding:14px;display:flex;flex-direction:column;gap:12px;flex:1}
+.d-status{display:flex;flex-direction:column;gap:8px}
+.d-status:empty{display:none}
+.d-card{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:2px 10px;align-items:center;background:var(--yolk-soft);border-radius:14px;padding:10px 12px}
+.d-card::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--yolk);grid-row:span 2}
+.d-card b{font-size:.95rem}
+.d-card span{font-size:.85rem;color:var(--muted);grid-column:2}
+.d-card .age{grid-row:1/span 2;grid-column:3;font-family:var(--mono);font-size:.8rem;color:var(--muted)}
+.d-card.s-ack{background:var(--teal-soft)} .d-card.s-ack::before{background:var(--teal)}
+.d-card.s-ack span{color:var(--teal);font-weight:700}
+.d-card.s-done{background:var(--surface);border:1px solid var(--line)} .d-card.s-done::before{background:var(--st-good)}
+.d-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.d-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;min-height:96px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:18px;font-weight:700;font-size:1rem;line-height:1.25;text-align:center;text-decoration:none;padding:10px 8px}
+.d-btn svg{width:28px;height:28px;color:var(--brand-line)}
+.d-btn.primary{border-color:var(--brand-line)}
+.d-btn.issue{border-color:var(--alert)}
+.d-btn.issue svg{color:var(--alert)}
+.d-btn:active{transform:scale(.97)}
+.d-grid>:last-child:nth-child(odd){grid-column:1/-1;flex-direction:row;min-height:62px}
+.d-fair{font-size:.8rem;color:var(--muted);text-align:center;line-height:1.4}
+.d-foot{padding:14px 16px 18px;display:flex;justify-content:center;align-items:center;gap:10px;font-family:var(--display);font-size:.95rem;color:var(--muted)}
+.d-foot button{font-family:var(--body);font-size:.8rem;font-weight:700;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:3px 10px;color:var(--teal)}
+.d-layer{position:absolute;inset:0;pointer-events:none;z-index:5}
+.standalone .d-layer{position:fixed;max-width:480px;margin-inline:auto}
+.d-scrim{position:absolute;inset:0;background:var(--scrim);pointer-events:auto}
+.d-sheet{position:absolute;inset-inline:0;bottom:0;max-height:92%;overflow-y:auto;background:var(--surface);color:var(--ink);border-radius:22px 22px 0 0;box-shadow:0 -12px 32px var(--shadow);padding:18px 16px calc(env(safe-area-inset-bottom,0px) + 18px);display:flex;flex-direction:column;gap:10px;pointer-events:auto}
+.d-sheet h2{font-family:var(--display);font-size:1.3rem}
+.d-sheet p{font-size:.85rem;color:var(--muted)}
+.d-chips{display:flex;flex-wrap:wrap;gap:8px}
+.d-chip{border:1.5px solid var(--line);background:var(--bg);border-radius:999px;padding:7px 12px;font-size:.92rem;font-weight:600}
+.d-chip[aria-pressed="true"]{border-color:var(--alert);color:var(--alert);background:var(--surface)}
+.d-sheet label{font-size:.85rem;font-weight:700}
+.d-sheet textarea{width:100%;min-height:68px;border:1.5px solid var(--line);border-radius:12px;padding:8px 10px;background:var(--bg);resize:vertical}
+.d-send{border:0;border-radius:14px;padding:12px;font-weight:800;background:var(--alert);color:var(--alert-ink)}
+.d-send.calm{background:var(--brand);color:var(--brand-ink)}
+.d-x{border:0;background:transparent;color:var(--muted);font-weight:700;padding:6px}
+.d-wifi{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 14px;background:var(--bg);border-radius:12px;padding:12px;font-size:.95rem}
+.d-wifi dt{color:var(--muted)} .d-wifi dd{margin:0;font-family:var(--mono);font-weight:700;overflow-wrap:anywhere;direction:ltr;text-align:end}
+.d-toast{position:absolute;inset-inline:14px;bottom:14px;background:var(--ink);color:var(--bg);border-radius:12px;padding:9px 12px;text-align:center;font-size:.9rem;font-weight:600;line-height:1.35;pointer-events:auto}
+.d-skel{display:grid;place-items:center;height:100%;color:var(--muted);font-size:.9rem;padding:24px;text-align:center}
+
+/* board */
+.board{display:flex;flex-direction:column;gap:14px;min-width:0}
+.b-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.b-head h2{font-size:1.4rem}
+.b-head .clock{font-family:var(--mono);font-size:.9rem;color:var(--muted);margin-inline-start:8px}
+.tools{display:flex;gap:6px;flex-wrap:wrap}
+.tool{border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 12px;font-weight:700;font-size:.84rem;color:var(--ink);display:inline-flex;align-items:center;gap:6px}
+.tool[aria-pressed="true"]{border-color:var(--teal);color:var(--teal)}
+.tool.go{border-color:var(--teal);background:var(--teal);color:var(--teal-ink)}
+.tool:disabled{opacity:.5;cursor:not-allowed}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 14px}
+.kpi b{display:block;font-weight:800;font-size:1.65rem;line-height:1.15}
+.kpi span{font-size:.8rem;color:var(--muted);font-weight:600}
+.kpi.hot{border-color:var(--alert)}
+.kpi.hot b{color:var(--alert)}
+.floor{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:8px}
+.tile{position:relative;aspect-ratio:1.2;border-radius:12px;border:1.5px solid var(--line);background:var(--surface);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-family:var(--display);font-size:1.3rem;line-height:1;color:var(--ink);padding:4px}
+.tile small{font-family:var(--mono);font-size:.68rem;color:var(--muted)}
+.tile.k-call,.tile.k-bill{background:var(--teal-soft);border-color:var(--teal)}
+.tile.k-issue{background:var(--alert);border-color:var(--alert);color:var(--alert-ink)}
+.tile.k-issue small{color:var(--alert-ink)}
+.tile.s-new::after{content:"";position:absolute;inset:-5px;border-radius:15px;border:2.5px solid var(--yolk);animation:ping 1.8s ease-out infinite}
+.tile.sel{outline:3px solid var(--ink);outline-offset:2px}
+@keyframes ping{0%{opacity:1;transform:scale(.96)}100%{opacity:0;transform:scale(1.08)}}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.78rem;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:12px;height:12px;border-radius:4px;border:1.5px solid var(--line);background:var(--surface)}
+.legend i.k-call{background:var(--teal-soft);border-color:var(--teal)}
+.legend i.k-issue{background:var(--alert);border-color:var(--alert)}
+.legend i.s-new{border:2.5px solid var(--yolk)}
+.queue{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;align-items:start}
+.tk{background:var(--ticket);border:1px solid var(--line);border-radius:4px;padding:12px 14px 20px;display:flex;flex-direction:column;gap:6px;position:relative;
+  -webkit-mask:radial-gradient(circle 5px at 50% 100%,transparent 98%,#000) 0 0/12px 100% repeat-x;mask:radial-gradient(circle 5px at 50% 100%,transparent 98%,#000) 0 0/12px 100% repeat-x}
+.tk.k-issue{box-shadow:inset -5px 0 0 var(--alert)}
+.tk.in{animation:print .35s ease-out}
+.tk.flash{animation:flash 1.2s ease-out}
+@keyframes print{from{transform:translateY(-12px);opacity:0}to{transform:none;opacity:1}}
+@keyframes flash{0%{background:var(--yolk-soft)}100%{background:var(--ticket)}}
+.tk-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.tk-t{font-family:var(--display);font-size:1.35rem;line-height:1}
+.pill{font-size:.75rem;font-weight:800;padding:2px 9px;border-radius:999px;white-space:nowrap;background:var(--teal-soft);color:var(--teal)}
+.pill.issue{background:var(--alert);color:var(--alert-ink)}
+.pill.new{background:var(--yolk);color:var(--yolk-ink)}
+.pill.muted{background:var(--grid);color:var(--muted)}
+.tk-why{font-weight:700}
+.tk-note{font-size:.95rem;overflow-wrap:anywhere}
+.tk-note small{display:block;font-size:.75rem;color:var(--muted)}
+.tk-meta{display:flex;justify-content:space-between;align-items:center;gap:8px;font-family:var(--mono);font-size:.78rem;color:var(--muted)}
+.age{font-family:var(--mono);font-variant-numeric:tabular-nums;border-radius:999px;padding:1px 8px;background:var(--grid);color:var(--ink);font-weight:700}
+.age.warn{background:var(--yolk-soft)}
+.age.warn::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--st-warn);margin-inline-end:5px;vertical-align:1px}
+.age.late{background:var(--alert);color:var(--alert-ink)}
+.age.late::after{content:" · מאחר";font-family:var(--body)}
+.tk-acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:2px}
+.tk-acts button{font-weight:800;font-size:.85rem;border-radius:999px;padding:5px 13px;border:1.5px solid var(--teal);background:transparent;color:var(--teal)}
+.tk-acts button.solid{background:var(--teal);color:var(--teal-ink)}
+.tk-acts button.ghost{border-color:transparent;color:var(--muted);padding-inline:6px;margin-inline-start:auto}
+.empty{border:1.5px dashed var(--line);border-radius:14px;padding:18px;color:var(--muted);text-align:center;font-size:.92rem;display:flex;flex-direction:column;gap:10px;align-items:center}
+.handled summary{cursor:pointer;font-weight:800;list-style:none;display:flex;gap:8px;align-items:center}
+.handled summary::-webkit-details-marker{display:none}
+.handled summary::before{content:"+";color:var(--teal);font-size:1.2rem;line-height:1}
+.handled[open] summary::before{content:"–"}
+.hlist{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column}
+.hlist li{display:grid;grid-template-columns:4.5em minmax(0,1fr) auto auto;gap:10px;align-items:baseline;padding:7px 0;border-top:1px solid var(--grid);font-size:.9rem}
+.hlist li b{font-family:var(--display);font-weight:400}
+.hlist .t{font-family:var(--mono);font-size:.8rem;color:var(--muted);font-variant-numeric:tabular-nums}
+
+/* report */
+.filters{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.seg{display:flex;gap:2px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:3px}
+.seg button{border:0;background:transparent;border-radius:999px;padding:5px 14px;font-weight:700;font-size:.88rem;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.period{font-size:.85rem;color:var(--muted)}
+.samplechip{display:inline-flex;align-items:center;gap:6px;font-size:.8rem;font-weight:700;background:var(--yolk-soft);border-radius:999px;padding:4px 11px}
+.stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.stat .l{font-size:.85rem;font-weight:700;color:var(--muted)}
+.stat .v{font-weight:800;font-size:1.9rem;line-height:1.15}
+.stat .s{font-size:.8rem;color:var(--muted);line-height:1.35}
+.cards2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.chead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:8px}
+.tview{border:1px solid var(--line);background:transparent;border-radius:999px;padding:2px 10px;font-size:.78rem;font-weight:700;color:var(--muted);white-space:nowrap}
+.viz{position:relative;min-height:60px}
+.viz svg{display:block;overflow:visible}
+.viz .gl{stroke:var(--grid);stroke-width:1}
+.viz .base{stroke:var(--line);stroke-width:1}
+.viz .tx{fill:var(--muted);font-size:11px;font-family:var(--body)}
+.viz .bar{fill:var(--chart)}
+.viz .bar.on{fill:var(--chart-hi)}
+.viz .hit{fill:transparent;cursor:default}
+.viz .hit:focus{outline:none}
+.viz .hit:focus-visible{stroke:var(--yolk);stroke-width:2}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--bg);border-radius:8px;padding:6px 10px;font-size:.8rem;line-height:1.3;white-space:nowrap;transform:translate(-50%,calc(-100% - 8px));z-index:3;display:flex;flex-direction:column}
+.tip b{font-size:.92rem}
+.tip span{opacity:.8}
+.hbars{display:flex;flex-direction:column;gap:9px}
+.hrow{display:grid;grid-template-columns:8.5em minmax(0,1fr) 2.5em;gap:10px;align-items:center;font-size:.9rem}
+.htrack{height:12px}
+.htrack i{display:block;height:100%;background:var(--chart);border-start-end-radius:4px;border-end-end-radius:4px;min-width:2px}
+.hrow b{font-variant-numeric:tabular-nums;text-align:end}
+.tbl-wrap{overflow-x:auto}
+table.data{width:100%;border-collapse:collapse;font-size:.88rem;font-variant-numeric:tabular-nums}
+table.data th{text-align:start;font-size:.75rem;color:var(--muted);font-weight:800;padding:6px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+table.data td{padding:7px 8px;border-bottom:1px solid var(--grid);white-space:nowrap}
+table.data td.tn{font-family:var(--display);font-size:1.05rem}
+.sbar{display:flex;align-items:center;gap:8px}
+.sbar i{display:block;height:8px;background:var(--chart);border-start-end-radius:4px;border-end-end-radius:4px;min-width:2px}
+.flag{display:inline-flex;align-items:center;gap:5px;font-size:.75rem;font-weight:700;color:var(--ink)}
+.flag::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--st-warn)}
+.meter{display:flex;height:10px;border-radius:999px;overflow:hidden;background:var(--grid);gap:2px;margin-block:8px 6px}
+.meter i{display:block;background:var(--chart)}
+.meter i+i{background:var(--chart-hi);opacity:.55}
+.gates{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 22px;margin-top:12px}
+.gate{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:4px 10px;align-items:start;padding-top:10px;border-top:1px solid var(--grid)}
+.gate svg{width:20px;height:20px;margin-top:2px}
+.gate .ok{color:var(--st-good)} .gate .no{color:var(--st-warn)} .gate .na{color:var(--muted)}
+.gate b{font-weight:800}
+.gate .val{font-weight:800;font-size:1.15rem;text-align:end}
+.gate .why{grid-column:2/-1;font-size:.82rem;color:var(--muted)}
+
+/* setup */
+.setup{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:22px;align-items:start}
+.form{display:flex;flex-direction:column;gap:14px}
+.fgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 16px}
+.field{display:flex;flex-direction:column;gap:5px;min-width:0}
+.field label,.flabel{font-size:.85rem;font-weight:800}
+.field input[type=text],.field input[type=number],.field input[type=url]{border:1.5px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--bg);width:100%;min-width:0}
+.field input[dir=ltr]{text-align:left}
+.field .err{font-size:.8rem;color:var(--alert);font-weight:700}
+.swatches{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.sw{width:32px;height:32px;border-radius:50%;border:3px solid var(--surface);box-shadow:0 0 0 1.5px var(--line)}
+.sw[aria-pressed="true"]{box-shadow:0 0 0 2.5px var(--ink)}
+.swatches input[type=color]{width:40px;height:34px;border:1.5px solid var(--line);border-radius:10px;background:var(--bg);padding:2px}
+.logo-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.logo-row .d-logo{width:46px;height:46px;font-size:1.1rem}
+.sr-file{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden}
+.checks{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.checks label{display:flex;align-items:center;gap:8px;border:1.5px solid var(--line);border-radius:10px;padding:7px 10px;font-weight:700;font-size:.9rem;background:var(--bg)}
+.checks input{accent-color:var(--teal);width:18px;height:18px}
+.form-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.form-actions span{font-size:.88rem;font-weight:700;color:var(--teal)}
+.preview-col{position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px);display:flex;flex-direction:column;align-items:center;gap:8px}
+.preview-col .d-shell{pointer-events:none}
+.labels{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;margin-top:12px}
+.label{border:1.5px dashed var(--line);border-radius:14px;padding:12px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
+.label b{font-family:var(--display);font-weight:400;font-size:1.1rem;line-height:1.1}
+.label .qr{border-radius:6px}
+.label .row{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.label button,.label a{font-size:.75rem;font-weight:800;border:1px solid var(--line);background:var(--surface);color:var(--teal);border-radius:999px;padding:3px 9px;text-decoration:none}
+.datarow{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-block:12px;border-top:1px solid var(--grid)}
+.datarow:first-of-type{border-top:0}
+.datarow p{max-width:44em}
+.note{font-size:.88rem;color:var(--muted)}
+.mono{font-family:var(--mono);font-size:.82rem;direction:ltr;unicode-bidi:isolate;overflow-wrap:anywhere}
+
+@media (max-width:1060px){
+  .stats{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media (max-width:980px){
+  .hub,.setup{grid-template-columns:minmax(0,1fr)}
+  .phonecol,.preview-col{position:static}
+  .cards2,.gates{grid-template-columns:minmax(0,1fr)}
+  .intro{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:640px){
+  .app{padding-inline:16px}
+  .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .fgrid{grid-template-columns:minmax(0,1fr)}
+  .conn{margin-inline-start:0}
+  .handset .screen{height:600px}
+}
+@media (prefers-reduced-motion:reduce){
+  .conn.live i,.tile.s-new::after,.tk.in,.tk.flash{animation:none}
+}
+</style>
+
+<div class="app" id="app" dir="rtl" lang="he">
+  <header class="bar">
+    <div class="mark">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M12 11q5 5 0 10M16.5 8q8 8 0 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+      קרוב <small>לייב</small>
+    </div>
+    <nav class="tabs" aria-label="תצוגות">
+      <button class="tab" type="button" data-view="demo">הדגמה</button>
+      <button class="tab" type="button" data-view="board">לוח הצוות</button>
+      <button class="tab" type="button" data-view="report">דוח לבעלים</button>
+      <button class="tab" type="button" data-view="setup">הגדרות</button>
+    </nav>
+    <div class="conn" id="conn" role="status"><i></i><span>מתחבר…</span></div>
+  </header>
+  <div class="banner" id="banner" hidden></div>
+  <main id="main"></main>
+</div>
+<div id="solo" hidden></div>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+(() => {
+'use strict';
+const ARTIFACT_URL = 'https://claude.ai/artifact/RvmjBDBjpxq152qEX1nuqU';
+const DAY = 86400000, STALE_MS = 3 * 3600000, WINDOW_DAYS = 30;
+const KINDS = ['call', 'bill', 'issue'], REASONS = ['cold', 'wait', 'wrong', 'dirty', 'other'];
+const LANGS = ['he', 'en', 'ru', 'ar'], SRCS = ['nfc', 'qr', 'demo'], STATUSES = ['new', 'ack', 'done', 'void'];
+const ACTS = ['menu', 'wifi', 'review', 'insta'];
+const DEFAULT_VENUE = {
+  name: 'קפה השכונה', tables: 12, color: '#0F5C4A', logo: '',
+  wifi: { ssid: 'Shchuna_Guests', pass: 'cappuccino12' },
+  links: { menu: '', review: '', insta: '' },
+  buttons: { call: true, bill: true, issue: true, review: true, menu: true, wifi: true, insta: false }
+};
+const SWATCHES = ['#0F5C4A', '#1E3A5F', '#7A2E3A', '#A4492A', '#2F2F2F', '#6B4E2E', '#4B6B2F', '#7B3F7A'];
+
+/* ---------- copy ---------- */
+const T = {
+  he: { dir: 'rtl', table: n => 'שולחן ' + n, call: 'קריאה למלצר', bill: 'בקשת חשבון', issue: 'משהו לא בסדר?', review: 'דרגו אותנו בגוגל', menu: 'תפריט', wifi: 'וויפיי', insta: 'אינסטגרם',
+    fair: 'כל הכפתורים מוצגים לכל לקוח, באותה צורה.', issueTitle: 'מה לא בסדר?', pick: 'בחרו מה קרה, או כתבו בקצרה. אפשר גם לשלוח בלי פרטים.', noteLabel: 'רוצים להוסיף משהו? (לא חובה)',
+    privacy: 'ההודעה מגיעה רק לצוות ונמחקת אחרי 90 יום. לא נאסף שום פרט מזהה.', send: 'שליחה לצוות', cancel: 'ביטול',
+    reasons: { cold: 'הגיע קר', wait: 'מחכים הרבה זמן', wrong: 'טעות בהזמנה', dirty: 'השולחן לא נקי', other: 'משהו אחר' },
+    kinds: { call: 'קריאה למלצר', bill: 'בקשת חשבון', issue: 'משהו לא בסדר' },
+    stNew: 'נשלח לצוות', stAck: { call: 'המלצר בדרך אליכם', bill: 'החשבון בדרך אליכם', issue: 'ראינו. מישהו מהצוות בדרך' }, stDone: 'טופל. תודה!', stVoid: 'הבקשה נסגרה',
+    sent: 'נשלח לצוות', issueSent: 'תודה. הצוות קיבל את ההודעה', already: 'הבקשה כבר אצל הצוות',
+    wifiTitle: 'וויפיי לאורחים', network: 'רשת', password: 'סיסמה', copyPass: 'העתקת הסיסמה', copied: 'הסיסמה הועתקה', close: 'סגירה',
+    demoMenu: v => 'בהדגמה: כאן נפתח התפריט של ' + v, demoReview: v => 'בהדגמה: כאן נפתח דף הביקורות של ' + v + ' בגוגל', demoInsta: v => 'בהדגמה: כאן נפתח האינסטגרם של ' + v,
+    viewOnly: 'ההדגמה פתוחה לצפייה בלבד', failed: 'השליחה לא הצליחה. נסו שוב בעוד רגע' },
+  en: { dir: 'ltr', table: n => 'Table ' + n, call: 'Call a server', bill: 'Ask for the bill', issue: 'Something wrong?', review: 'Review us on Google', menu: 'Menu', wifi: 'Wi‑Fi', insta: 'Instagram',
+    fair: 'Every guest sees the same buttons.', issueTitle: "What's wrong?", pick: 'Pick what happened, or write a few words. You can also send it as is.', noteLabel: 'Anything to add? (optional)',
+    privacy: 'Only the staff sees this. It is deleted after 90 days. No personal details are collected.', send: 'Send to staff', cancel: 'Cancel',
+    reasons: { cold: 'It arrived cold', wait: "We've been waiting a while", wrong: 'Wrong order', dirty: "The table isn't clean", other: 'Something else' },
+    kinds: { call: 'Call a server', bill: 'Bill request', issue: 'Something wrong' },
+    stNew: 'Sent to the staff', stAck: { call: 'Your server is on the way', bill: 'Your bill is on the way', issue: "We saw it. Someone's on the way" }, stDone: 'Done. Thank you!', stVoid: 'Request closed',
+    sent: 'Sent to the staff', issueSent: 'Thanks. The staff got your message', already: 'Already sent. The staff has it',
+    wifiTitle: 'Guest Wi‑Fi', network: 'Network', password: 'Password', copyPass: 'Copy password', copied: 'Password copied', close: 'Close',
+    demoMenu: v => 'Demo: this opens the menu of ' + v, demoReview: v => 'Demo: this opens the Google reviews page of ' + v, demoInsta: v => 'Demo: this opens the Instagram of ' + v,
+    viewOnly: 'This demo is view-only', failed: "Couldn't send. Try again in a moment" },
+  ru: { dir: 'ltr', table: n => 'Стол ' + n, call: 'Позвать официанта', bill: 'Попросить счёт', issue: 'Что-то не так?', review: 'Оценить нас в Google', menu: 'Меню', wifi: 'Wi‑Fi', insta: 'Instagram',
+    fair: 'Все кнопки одинаково доступны каждому гостю.', issueTitle: 'Что не так?', pick: 'Выберите, что случилось, или напишите пару слов. Можно отправить и без подробностей.', noteLabel: 'Хотите что-то добавить? (необязательно)',
+    privacy: 'Сообщение увидит только персонал. Оно удаляется через 90 дней. Мы не собираем личные данные.', send: 'Отправить персоналу', cancel: 'Отмена',
+    reasons: { cold: 'Принесли холодным', wait: 'Долго ждём', wrong: 'Ошибка в заказе', dirty: 'Стол не убран', other: 'Другое' },
+    kinds: { call: 'Вызов официанта', bill: 'Запрос счёта', issue: 'Что-то не так' },
+    stNew: 'Отправлено персоналу', stAck: { call: 'Официант уже идёт', bill: 'Счёт уже несут', issue: 'Мы увидели. К вам уже идут' }, stDone: 'Готово. Спасибо!', stVoid: 'Запрос закрыт',
+    sent: 'Отправлено персоналу', issueSent: 'Спасибо. Персонал получил сообщение', already: 'Уже отправлено. Персонал в курсе',
+    wifiTitle: 'Wi‑Fi для гостей', network: 'Сеть', password: 'Пароль', copyPass: 'Скопировать пароль', copied: 'Пароль скопирован', close: 'Закрыть',
+    demoMenu: v => 'Демо: здесь откроется меню ' + v, demoReview: v => 'Демо: здесь откроется страница отзывов ' + v + ' в Google', demoInsta: v => 'Демо: здесь откроется Instagram ' + v,
+    viewOnly: 'Демо доступно только для просмотра', failed: 'Не удалось отправить. Попробуйте ещё раз' },
+  ar: { dir: 'rtl', table: n => 'طاولة ' + n, call: 'استدعاء النادل', bill: 'طلب الحساب', issue: 'هل هناك مشكلة؟', review: 'قيّمونا على Google', menu: 'قائمة الطعام', wifi: 'واي فاي', insta: 'إنستغرام',
+    fair: 'جميع الأزرار متاحة لكل زبون بالشكل نفسه.', issueTitle: 'ما المشكلة؟', pick: 'اختاروا ما حدث، أو اكتبوا باختصار. يمكن الإرسال من دون تفاصيل أيضًا.', noteLabel: 'هل تريدون إضافة شيء؟ (اختياري)',
+    privacy: 'تصل الرسالة إلى الطاقم فقط وتُحذف بعد 90 يومًا. لا نجمع أي معلومات شخصية.', send: 'إرسال إلى الطاقم', cancel: 'إلغاء',
+    reasons: { cold: 'وصل الطلب باردًا', wait: 'ننتظر منذ وقت طويل', wrong: 'خطأ في الطلب', dirty: 'الطاولة غير نظيفة', other: 'شيء آخر' },
+    kinds: { call: 'استدعاء النادل', bill: 'طلب الحساب', issue: 'هناك مشكلة' },
+    stNew: 'أُرسل إلى الطاقم', stAck: { call: 'النادل في الطريق إليكم', bill: 'الحساب في الطريق إليكم', issue: 'رأينا رسالتكم. أحد أفراد الطاقم في الطريق' }, stDone: 'تم. شكرًا لكم!', stVoid: 'تم إغلاق الطلب',
+    sent: 'أُرسل إلى الطاقم', issueSent: 'شكرًا. وصلت رسالتكم إلى الطاقم', already: 'تم الإرسال بالفعل. الطاقم على علم',
+    wifiTitle: 'واي فاي للضيوف', network: 'الشبكة', password: 'كلمة المرور', copyPass: 'نسخ كلمة المرور', copied: 'تم نسخ كلمة المرور', close: 'إغلاق',
+    demoMenu: v => 'عرض تجريبي: هنا تُفتح قائمة الطعام في ' + v, demoReview: v => 'عرض تجريبي: هنا تُفتح صفحة تقييمات ' + v + ' على Google', demoInsta: v => 'عرض تجريبي: هنا يُفتح إنستغرام ' + v,
+    viewOnly: 'هذا العرض للمشاهدة فقط', failed: 'تعذّر الإرسال. حاولوا مرة أخرى بعد قليل' }
+};
+const LANG_BTN = { he: 'עב', en: 'EN', ru: 'РУ', ar: 'عر' };
+const LANG_HE = { he: 'עברית', en: 'אנגלית', ru: 'רוסית', ar: 'ערבית' };
+const SRC_HE = { nfc: 'NFC', qr: 'QR', demo: 'הדגמה' };
+const KIND_HE = T.he.kinds, REASON_HE = T.he.reasons;
+const BTN_HE = { call: 'קריאה למלצר', bill: 'בקשת חשבון', issue: 'משהו לא בסדר', review: 'דרגו אותנו', menu: 'תפריט', wifi: 'וויפיי', insta: 'אינסטגרם' };
+
+const ICON = {
+  call: '<path d="M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 21h4"/>',
+  bill: '<path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/>',
+  issue: '<path d="M12 3.5l9.5 16.5h-19z"/><path d="M12 10v4.5M12 17.5v.01"/>',
+  review: '<path d="M12 3.5l2.6 5.5 6 .7-4.4 4.1 1.1 6-5.3-3-5.3 3 1.1-6-4.4-4.1 6-.7z"/>',
+  menu: '<path d="M3 5h6a3 3 0 0 1 3 3v12a2 2 0 0 0-2-2H3z"/><path d="M21 5h-6a3 3 0 0 0-3 3v12a2 2 0 0 1 2-2h7z"/>',
+  wifi: '<path d="M2.5 9a14 14 0 0 1 19 0"/><path d="M5.5 12.5a9.5 9.5 0 0 1 13 0"/><path d="M8.5 16a5 5 0 0 1 7 0"/><path d="M12 19.5v.01"/>',
+  insta: '<rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17 7v.01"/>',
+  ok: '<circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.7 2.7L16 9.8"/>',
+  warn: '<path d="M12 3.5l9.5 16.5h-19z"/><path d="M12 10v4M12 17v.01"/>',
+  na: '<circle cx="12" cy="12" r="9"/><path d="M8 12h8"/>'
+};
+const svgIcon = k => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ICON[k] + '</svg>';
+
+/* ---------- utils ---------- */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const int = (v, lo, hi) => { v = Math.round(Number(v)); return Number.isFinite(v) && v >= lo && v <= hi ? v : null; };
+const num = v => (typeof v === 'number' && Number.isFinite(v) && v > 0) ? v : 0;
+const mmss = ms => { let s = Math.max(0, Math.round(ms / 1000)); const m = Math.floor(s / 60); s %= 60; return m + ':' + String(s).padStart(2, '0'); };
+const hhmm = ts => new Date(ts).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
+const dmy = ts => { const d = new Date(ts); return d.getDate() + '.' + (d.getMonth() + 1) + '.' + d.getFullYear(); };
+const fmt1 = v => (Math.round(v * 10) / 10).toLocaleString('he-IL');
+const startOfDay = (ts, back = 0) => { const d = new Date(ts); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() - back); return d.getTime(); };
+const isHttps = u => typeof u === 'string' && u.length < 400 && /^https:\/\/[^\s"'<>]+$/i.test(u);
+const isHex = c => typeof c === 'string' && /^#[0-9a-f]{6}$/i.test(c);
+const isLogo = s => typeof s === 'string' && s.length < 300000 && /^data:image\/(png|jpeg|webp|gif);base64,[a-z0-9+/=]+$/i.test(s);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const median = a => { if (!a.length) return 0; const b = a.slice().sort((x, y) => x - y), m = b.length >> 1; return b.length % 2 ? b[m] : (b[m - 1] + b[m]) / 2; };
+const avg = a => a.length ? a.reduce((s, v) => s + v, 0) / a.length : 0;
+function lum(hex) { const n = parseInt(hex.slice(1), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255].map(v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }).reduce((s, v, i) => s + v * [0.2126, 0.7152, 0.0722][i], 0); }
+function inkFor(hex) { const L = lum(hex); return (1.05 / (L + 0.05)) >= ((L + 0.05) / 0.06) ? '#FFFFFF' : '#161616'; }
+function initials(name) { return String(name || '').trim().split(/\s+/).slice(0, 2).map(w => Array.from(w)[0] || '').join(''); }
+function linkFor(n, kind) { return ARTIFACT_URL ? ARTIFACT_URL + '#' + (kind === 'qr' ? 'q' : 't') + n : ''; }
+const chains = new Map();
+function serial(key, fn) { const p = (chains.get(key) || Promise.resolve()).catch(() => {}).then(fn); chains.set(key, p); return p; }
+function copyText(text, onOk, onFail) {
+  try { navigator.clipboard.writeText(text).then(onOk, onFail); } catch (e) { onFail(); }
+}
+
+/* ---------- sanitizers (stored data is untrusted) ---------- */
+function cleanVenue(d) {
+  const v = JSON.parse(JSON.stringify(DEFAULT_VENUE));
+  if (!d || typeof d !== 'object') return v;
+  if (typeof d.name === 'string' && d.name.trim()) v.name = d.name.trim().slice(0, 40);
+  v.tables = int(d.tables, 1, 40) || v.tables;
+  if (isHex(d.color)) v.color = d.color;
+  v.logo = isLogo(d.logo) ? d.logo : '';
+  if (d.wifi && typeof d.wifi === 'object') { v.wifi.ssid = String(d.wifi.ssid || '').slice(0, 40); v.wifi.pass = String(d.wifi.pass || '').slice(0, 64); }
+  if (d.links && typeof d.links === 'object') for (const k of ['menu', 'review', 'insta']) v.links[k] = isHttps(d.links[k]) ? d.links[k] : '';
+  if (d.buttons && typeof d.buttons === 'object') for (const k of Object.keys(v.buttons)) if (typeof d.buttons[k] === 'boolean') v.buttons[k] = d.buttons[k];
+  return v;
+}
+function cleanReq(r) {
+  if (!r || typeof r !== 'object') return null;
+  const table = int(r.table, 1, 99), createdAt = num(r.createdAt);
+  if (!table || !KINDS.includes(r.kind) || !createdAt) return null;
+  return { id: String(r.id), table, kind: r.kind, reason: REASONS.includes(r.reason) ? r.reason : '', note: typeof r.note === 'string' ? r.note.slice(0, 200) : '',
+    lang: LANGS.includes(r.lang) ? r.lang : 'he', src: SRCS.includes(r.src) ? r.src : 'demo', status: STATUSES.includes(r.status) ? r.status : 'new',
+    createdAt, ackAt: num(r.ackAt), doneAt: num(r.doneAt), sim: r.sim === true };
+}
+function cleanScan(s) {
+  if (!s || typeof s !== 'object') return null;
+  const table = int(s.table, 1, 99), at = num(s.at);
+  if (!table || !at) return null;
+  return { id: String(s.id), table, at, src: SRCS.includes(s.src) ? s.src : 'demo', lang: LANGS.includes(s.lang) ? s.lang : 'he',
+    acts: Array.isArray(s.acts) ? s.acts.filter(a => ACTS.includes(a)).slice(0, 12) : [] };
+}
+function cleanHistory(h) {
+  if (!h || typeof h !== 'object' || !Array.isArray(h.scans) || !Array.isArray(h.reqs)) return null;
+  const ok = (row, n) => Array.isArray(row) && row.length === n && row.every(x => typeof x === 'number' && Number.isFinite(x));
+  return {
+    tables: int(h.tables, 1, 40) || 12,
+    scans: h.scans.filter(r => ok(r, 5) && r[0] >= 1 && r[0] <= 31).slice(0, 4000),
+    reqs: h.reqs.filter(r => ok(r, 7) && r[0] >= 1 && r[0] <= 31 && r[3] >= 0 && r[3] <= 2).slice(0, 2000)
+  };
+}
+
+/* ---------- sample week (relative days, so it always reads as "last week") ---------- */
+function mulberry32(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function genSample(tables, seed) {
+  tables = int(tables, 2, 40) || 12;
+  const R = mulberry32(seed || 20260924);
+  const pick = w => { let s = 0; for (const x of w) s += x; let r = R() * s; for (let i = 0; i < w.length; i++) { r -= w[i]; if (r < 0) return i; } return w.length - 1; };
+  const HW = [3, 6, 7, 5, 3, 4, 7, 8, 5, 3, 3, 4, 6, 6, 4, 2]; // 07:00..22:00
+  const TW = Array.from({ length: tables }, () => 1);
+  TW[Math.min(tables, 9) - 1] = 2.2;   // the window table
+  TW[Math.min(tables, 4) - 1] = 0.18;  // the table behind the pillar
+  const scans = [], reqs = [];
+  for (let d = 7; d >= 1; d--) {
+    const n = Math.round(tables * 1.25 * (0.8 + R() * 0.5));
+    for (let i = 0; i < n; i++) {
+      const h = 7 + pick(HW), m = h * 60 + Math.floor(R() * 60), t = pick(TW) + 1, src = R() < 0.64 ? 0 : 1;
+      let mask = 0; if (R() < 0.62) mask |= 1; if (R() < 0.24) mask |= 2; if (R() < 0.11) mask |= 4; if (R() < 0.05) mask |= 8;
+      scans.push([d, m, t, src, mask]);
+      if (R() < 0.17) {
+        const kind = pick([50, 34, 16]), reason = kind === 2 ? 1 + pick([25, 40, 20, 10, 5]) : 0;
+        const peak = (h >= 12 && h <= 14) || (h >= 19 && h <= 21);
+        const resp = Math.round((kind === 1 ? 55 : kind === 2 ? 95 : 65) * (peak ? 1.6 : 1) * (0.55 + R() * 1.1));
+        reqs.push([d, Math.min(1439, m + 1 + Math.floor(R() * 20)), t, kind, reason, resp, R() < 0.06 ? 1 : 0]);
+      }
+    }
+  }
+  scans.sort((a, b) => b[0] - a[0] || a[1] - b[1]); reqs.sort((a, b) => b[0] - a[0] || a[1] - b[1]);
+  return { v: 1, label: 'נתוני דוגמה', tables, scans, reqs };
+}
+
+/* ---------- stores ---------- */
+function LocalStore() {
+  const L = { venue: cleanVenue(DEFAULT_VENUE), reqs: new Map(), scans: new Map(), hist: genSample(12), subs: { venue: new Set(), reqs: new Set(), scans: new Set(), hist: new Set() } };
+  const emit = k => setTimeout(() => L.subs[k].forEach(f => f()), 0);
+  const nid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+  const sub = (k, f) => { L.subs[k].add(f); f(); return () => L.subs[k].delete(f); };
+  return {
+    mode: 'local',
+    onVenue: cb => sub('venue', () => cb(L.venue)),
+    saveVenue: d => { L.venue = JSON.parse(JSON.stringify(d)); emit('venue'); return Promise.resolve(); },
+    onRequests: (since, cb) => sub('reqs', () => cb([...L.reqs].map(([id, d]) => Object.assign({ id }, d)).filter(r => r.createdAt >= since))),
+    addRequest: d => { const id = nid(); L.reqs.set(id, Object.assign({}, d)); emit('reqs'); return Promise.resolve(id); },
+    updateRequest: (id, p) => { const d = L.reqs.get(id); if (d) { Object.assign(d, p); emit('reqs'); } return Promise.resolve(); },
+    onScans: (since, cb) => sub('scans', () => cb([...L.scans].map(([id, d]) => Object.assign({ id }, d)).filter(s => s.at >= since))),
+    addScan: d => { const id = nid(); L.scans.set(id, Object.assign({}, d)); emit('scans'); return Promise.resolve(id); },
+    updateScan: (id, p) => { const d = L.scans.get(id); if (d) { Object.assign(d, p); emit('scans'); } return Promise.resolve(); },
+    onHistory: cb => sub('hist', () => cb(L.hist)),
+    setHistory: d => { L.hist = d; emit('hist'); return Promise.resolve(); },
+    clearHistory: () => { L.hist = null; emit('hist'); return Promise.resolve(); },
+    resetLive: async () => { const n = L.reqs.size + L.scans.size; L.reqs.clear(); L.scans.clear(); emit('reqs'); emit('scans'); return n; }
+  };
+}
+function LiveStore(db) {
+  const reqCol = db.collection('requests'), scanCol = db.collection('scans');
+  const venueRef = db.doc('venue/main'), histRef = db.doc('history/sample');
+  const rows = snap => snap.docs.map(d => Object.assign({ id: d.id }, d.data() || {}));
+  return {
+    mode: 'live',
+    onVenue: (cb, err) => venueRef.onSnapshot(s => cb(s.exists ? s.data() : null), err),
+    saveVenue: d => venueRef.set(d),
+    onRequests: (since, cb, err) => reqCol.where('createdAt', '>=', since).orderBy('createdAt', 'desc').limit(600).onSnapshot(s => cb(rows(s)), err),
+    addRequest: d => { const ref = reqCol.doc(); return ref.set(d).then(() => ref.id); },
+    updateRequest: (id, p) => reqCol.doc(id).update(p),
+    onScans: (since, cb, err) => scanCol.where('at', '>=', since).orderBy('at', 'desc').limit(1000).onSnapshot(s => cb(rows(s)), err),
+    addScan: d => { const ref = scanCol.doc(); return ref.set(d).then(() => ref.id); },
+    updateScan: (id, p) => scanCol.doc(id).update(p),
+    onHistory: (cb, err) => histRef.onSnapshot(s => cb(s.exists ? s.data() : null), err),
+    setHistory: d => histRef.set(d),
+    clearHistory: () => histRef.delete(),
+    resetLive: async progress => {
+      const [a, b] = await Promise.all([reqCol.limit(1000).get(), scanCol.limit(1000).get()]);
+      const refs = a.docs.map(d => reqCol.doc(d.id)).concat(b.docs.map(d => scanCol.doc(d.id)));
+      const total = refs.length; let done = 0;
+      const worker = async () => { while (refs.length) { await refs.pop().delete(); done++; if (progress) progress(done, total); } };
+      await Promise.all([worker(), worker(), worker()]);
+      return total;
+    }
+  };
+}
+
+/* ---------- state ---------- */
+const S = {
+  mode: 'connecting', store: null, isEditor: false,
+  venueRaw: null, venueLoaded: false, requests: [], scans: [], hist: null,
+  view: 'demo', solo: null, hubTable: 7, range: '7', selTable: 0,
+  soundOn: false, wake: null, rush: 0, draft: null, dirty: false, confirmReset: false, busy: '', seenReqs: null, bootAt: Date.now()
+};
+const venue = () => cleanVenue(S.venueRaw);
+const canWrite = () => S.mode === 'live' || S.mode === 'local';
+let hubDiner = null, soloDiner = null, audio = null, renderQueued = false, toastT = 0;
+
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => { t.hidden = true; }, 2600); }
+function queueRender() { if (renderQueued) return; renderQueued = true; requestAnimationFrame(() => { renderQueued = false; render(); }); }
+
+function writeFailed(e, quiet) {
+  const code = e && e.code;
+  if (code === 'invalid_argument' && S.mode === 'live') { S.mode = 'readonly'; queueRender(); toast('אין לכם הרשאה לכתוב בדף הזה. עברנו לצפייה בלבד.'); return; }
+  if (code === 'quota_exceeded') { toast('בסיס הנתונים מלא. מחקו את הפניות והסריקות בהגדרות ונסו שוב.'); return; }
+  if (code === 'resource_exhausted') { toast('יותר מדי פעולות ברגע אחד. נסו שוב בעוד כמה שניות.'); return; }
+  if (code === 'revoked' || code === 'not_granted' || code === 'capability_disabled') { S.mode = 'offline'; queueRender(); return; }
+  if (!quiet) toast('הפעולה לא נשמרה. בדקו את החיבור ונסו שוב.');
+}
+async function write(fn, quiet) {
+  try { return await fn(); }
+  catch (e) {
+    if (e && e.code === 'unavailable') { await sleep(400 + Math.random() * 600); try { return await fn(); } catch (e2) { writeFailed(e2, quiet); throw e2; } }
+    writeFailed(e, quiet); throw e;
+  }
+}
+
+/* ---------- boot ---------- */
+function parseHash() {
+  const h = (location.hash || '').replace(/^#/, '');
+  const m = /^([tq])(\d{1,2})$/.exec(h);
+  if (m) { S.solo = { table: int(m[2], 1, 99) || 1, src: m[1] === 't' ? 'nfc' : 'qr' }; return; }
+  S.solo = null;
+  S.view = ['demo', 'board', 'report', 'setup'].includes(h) ? h : 'demo';
+}
+function setView(v) {
+  S.view = v; S.selTable = 0;
+  try { history.replaceState(null, '', '#' + v); } catch (e) { /* frame may refuse; the view still switches */ }
+  render(); window.scrollTo(0, 0);
+}
+async function connect() {
+  let db = null, user = null;
+  if (window.claude && typeof window.claude.use === 'function') {
+    try { [db, user] = await Promise.all([window.claude.use('db'), window.claude.use('user')]); } catch (e) { db = null; }
+  }
+  if (!db) { attach(LocalStore(), 'local'); return; }
+  let can = null;
+  try { can = user ? await user.can('data.write') : null; } catch (e) { can = null; }
+  try { S.isEditor = user ? await user.canEdit() : false; } catch (e) { S.isEditor = false; }
+  attach(LiveStore(db), can === false ? 'readonly' : 'live');
+}
+function attach(store, mode) {
+  S.store = store; S.mode = mode;
+  const since = startOfDay(Date.now(), WINDOW_DAYS);
+  const fail = e => { if (e && (e.code === 'revoked' || e.code === 'unavailable')) { S.mode = 'offline'; queueRender(); } };
+  store.onVenue(d => { S.venueRaw = d; S.venueLoaded = true; queueRender(); }, fail);
+  store.onRequests(since, list => { onRequests(list.map(cleanReq).filter(Boolean)); }, fail);
+  if (!S.solo) {
+    store.onScans(since, list => { S.scans = list.map(cleanScan).filter(Boolean); queueRender(); }, fail);
+    store.onHistory(d => { S.hist = cleanHistory(d); queueRender(); }, fail);
+  }
+  if (S.solo && canWrite()) soloDiner && soloDiner.ensureScan();
+  queueRender();
+}
+function onRequests(list) {
+  const prev = S.seenReqs;
+  S.requests = list.sort((a, b) => b.createdAt - a.createdAt);
+  S.seenReqs = new Set(list.map(r => r.id));
+  if (prev) {
+    const fresh = list.filter(r => !prev.has(r.id) && r.status === 'new' && r.createdAt > S.bootAt - 5000);
+    if (fresh.length) { S.freshIds = new Set(fresh.map(r => r.id)); if (S.soundOn && !S.solo) beep(fresh.some(r => r.kind === 'issue')); }
+  }
+  queueRender();
+}
+
+/* ---------- diner (the page a guest opens from the stand) ---------- */
+function dinerHTML(v, lang, table, opts) {
+  const t = T[lang], B = v.buttons, logo = v.logo
+    ? '<div class="d-logo img"><img alt="" src="' + esc(v.logo) + '"></div>'
+    : '<div class="d-logo" aria-hidden="true">' + esc(initials(v.name)) + '</div>';
+  const items = [];
+  const btn = (k, cls) => {
+    const label = esc(t[k]), inner = svgIcon(k) + '<span>' + label + '</span>';
+    const href = { menu: v.links.menu, review: v.links.review, insta: v.links.insta }[k];
+    if (href && !opts.preview) return '<a class="d-btn ' + cls + '" data-k="' + k + '" href="' + esc(href) + '" target="_blank" rel="noopener">' + inner + '</a>';
+    return '<button type="button" class="d-btn ' + cls + '" data-k="' + k + '">' + inner + '</button>';
+  };
+  if (B.call) items.push(btn('call', 'primary'));
+  if (B.bill) items.push(btn('bill', 'primary'));
+  if (B.issue) items.push(btn('issue', 'issue'));
+  if (B.review) items.push(btn('review', ''));
+  if (B.menu) items.push(btn('menu', ''));
+  if (B.wifi) items.push(btn('wifi', ''));
+  if (B.insta) items.push(btn('insta', ''));
+  return '<div class="diner" dir="' + t.dir + '" lang="' + lang + '" style="--brand:' + v.color + ';--brand-ink:' + inkFor(v.color) + '">' +
+    '<header class="d-head">' + logo + '<div class="d-name">' + esc(v.name) + '</div><div class="d-table">' + esc(t.table(table)) + '</div>' +
+    '<div class="d-langs" role="group" aria-label="Language">' + LANGS.map(l => '<button type="button" class="d-lang" data-lang="' + l + '" lang="' + l + '" aria-pressed="' + (l === lang) + '">' + LANG_BTN[l] + '</button>').join('') + '</div></header>' +
+    '<div class="d-body"><div class="d-status" data-role="status" aria-live="polite"></div>' +
+    '<div class="d-grid">' + items.join('') + '</div><p class="d-fair">' + esc(t.fair) + '</p></div>' +
+    '<footer class="d-foot">קרוב' + (opts.editorLink ? '<button type="button" data-k="toboard">לוח הצוות</button>' : '') + '</footer></div>';
+}
+function layerHTML(v, lang) {
+  const t = T[lang];
+  return '<div class="d-layer" dir="' + t.dir + '" lang="' + lang + '"><div class="d-scrim" data-k="close" hidden></div>' +
+    '<section class="d-sheet" data-sheet="issue" role="dialog" aria-modal="true" aria-label="' + esc(t.issueTitle) + '" hidden><h2>' + esc(t.issueTitle) + '</h2><p>' + esc(t.pick) + '</p>' +
+    '<div class="d-chips">' + REASONS.map(r => '<button type="button" class="d-chip" data-reason="' + r + '" aria-pressed="false">' + esc(t.reasons[r]) + '</button>').join('') + '</div>' +
+    '<label for="d-note-' + lang + '">' + esc(t.noteLabel) + '</label><textarea id="d-note-' + lang + '" maxlength="140" data-role="note"></textarea>' +
+    '<p>' + esc(t.privacy) + '</p><button type="button" class="d-send" data-k="send">' + esc(t.send) + '</button><button type="button" class="d-x" data-k="close">' + esc(t.cancel) + '</button></section>' +
+    '<section class="d-sheet" data-sheet="wifi" role="dialog" aria-modal="true" aria-label="' + esc(t.wifiTitle) + '" hidden><h2>' + esc(t.wifiTitle) + '</h2>' +
+    '<dl class="d-wifi"><dt>' + esc(t.network) + '</dt><dd>' + esc(v.wifi.ssid || '—') + '</dd><dt>' + esc(t.password) + '</dt><dd data-role="pass">' + esc(v.wifi.pass || '—') + '</dd></dl>' +
+    '<button type="button" class="d-send calm" data-k="copypass">' + esc(t.copyPass) + '</button><button type="button" class="d-x" data-k="close">' + esc(t.close) + '</button></section>' +
+    '<div class="d-toast" role="status" hidden></div></div>';
+}
+function makeDiner(shell, mode, table, src) {
+  const nav = (navigator.language || 'he').slice(0, 2).toLowerCase();
+  const D = { shell, mode, table, src, lang: mode === 'solo' ? (LANGS.includes(nav) ? nav : (nav === 'iw' ? 'he' : 'en')) : 'he', sig: '', scanId: null, scanTable: 0, acts: [], reason: '', sheet: '', toastT: 0, cool: {} };
+  D.mount = force => {
+    const v = venue(), sig = JSON.stringify([v, D.lang, D.table, S.isEditor]);
+    if (!force && sig === D.sig) { D.refresh(); return; }
+    D.sig = sig; D.sheet = '';
+    shell.innerHTML = dinerHTML(v, D.lang, D.table, { editorLink: mode === 'solo' && S.isEditor }) + layerHTML(v, D.lang);
+    D.refresh();
+  };
+  D.refresh = () => {
+    const box = $('[data-role="status"]', shell); if (!box) return;
+    const t = T[D.lang], now = Date.now();
+    const mine = S.requests.filter(r => r.table === D.table && (((r.status === 'new' || r.status === 'ack') && now - r.createdAt < STALE_MS) || ((r.status === 'done' || r.status === 'void') && now - (r.doneAt || 0) < 8000))).slice(0, 3);
+    box.innerHTML = mine.map(r => {
+      const st = r.status === 'new' ? t.stNew : r.status === 'ack' ? t.stAck[r.kind] : r.status === 'done' ? t.stDone : t.stVoid;
+      const cls = r.status === 'new' ? 's-new' : r.status === 'ack' ? 's-ack' : 's-done';
+      return '<div class="d-card ' + cls + '"><b>' + esc(t.kinds[r.kind]) + '</b><span>' + esc(st) + '</span>' + (r.status === 'new' || r.status === 'ack' ? '<span class="age" data-since="' + r.createdAt + '">' + mmss(now - r.createdAt) + '</span>' : '') + '</div>';
+    }).join('');
+    D.hasDone = mine.some(r => r.status === 'done' || r.status === 'void');
+  };
+  D.say = msg => { const n = $('.d-toast', shell); if (!n) return; n.textContent = msg; n.hidden = false; clearTimeout(D.toastT); D.toastT = setTimeout(() => { n.hidden = true; }, 2600); };
+  D.open = name => {
+    D.sheet = name; $('.d-scrim', shell).hidden = !name;
+    $$('.d-sheet', shell).forEach(s => { s.hidden = s.dataset.sheet !== name; });
+    if (name === 'issue') { D.reason = ''; $$('.d-chip', shell).forEach(c => c.setAttribute('aria-pressed', 'false')); const n = $('[data-role="note"]', shell); if (n) n.value = ''; const f = $('.d-chip', shell); if (f) f.focus(); }
+    if (name === 'wifi') { const b = $('[data-k="copypass"]', shell); if (b) b.focus(); }
+  };
+  D.ensureScan = async () => {
+    if (!canWrite() || !S.store) return null;
+    if (D.scanId && D.scanTable === D.table) return D.scanId;
+    D.scanTable = D.table; D.acts = [];
+    const data = { table: D.table, at: Date.now(), src: D.src, lang: D.lang, acts: [] };
+    D.scanId = serial('scan-new', () => write(() => S.store.addScan(data), true)).catch(() => null);
+    D.scanId = await D.scanId;
+    return D.scanId;
+  };
+  D.logAct = async a => {
+    const id = await D.ensureScan(); if (!id) return;
+    if (!D.acts.includes(a)) D.acts.push(a);
+    const acts = D.acts.slice();
+    serial('scan:' + id, () => write(() => S.store.updateScan(id, { acts }), true)).catch(() => {});
+  };
+  D.request = async (kind, reason, note) => {
+    const t = T[D.lang];
+    if (!canWrite()) { D.say(t.viewOnly); return; }
+    const now = Date.now(), key = D.table + kind;
+    const open = kind !== 'issue' && S.requests.find(r => r.table === D.table && r.kind === kind && (r.status === 'new' || r.status === 'ack') && now - r.createdAt < STALE_MS);
+    if (open || (D.cool[key] && now - D.cool[key] < 15000)) { D.say(t.already); return; }
+    D.cool[key] = now;
+    D.ensureScan();
+    const data = { table: D.table, kind, reason: reason || '', note: (note || '').trim().slice(0, 140), lang: D.lang, src: D.src, status: 'new', createdAt: now, ackAt: 0, doneAt: 0 };
+    try { await write(() => S.store.addRequest(data), true); D.say(kind === 'issue' ? t.issueSent : t.sent); }
+    catch (e) { D.cool[key] = 0; D.say(t.failed); }
+  };
+  shell.addEventListener('click', e => {
+    const lang = e.target.closest('[data-lang]');
+    if (lang) { D.lang = lang.dataset.lang; D.mount(true); return; }
+    const chip = e.target.closest('[data-reason]');
+    if (chip) { const on = chip.getAttribute('aria-pressed') !== 'true'; $$('.d-chip', shell).forEach(c => c.setAttribute('aria-pressed', String(c === chip && on))); D.reason = on ? chip.dataset.reason : ''; return; }
+    const el = e.target.closest('[data-k]'); if (!el) return;
+    const k = el.dataset.k, t = T[D.lang], v = venue();
+    if (k === 'call' || k === 'bill') { D.request(k); return; }
+    if (k === 'issue') { if (!canWrite()) { D.say(t.viewOnly); return; } D.open('issue'); return; }
+    if (k === 'send') { const note = ($('[data-role="note"]', shell) || {}).value || ''; D.open(''); D.request('issue', D.reason, note); return; }
+    if (k === 'close') { D.open(''); return; }
+    if (k === 'wifi') { D.open('wifi'); D.logAct('wifi'); return; }
+    if (k === 'copypass') { const p = v.wifi.pass || ''; copyText(p, () => D.say(t.copied), () => { const n = $('[data-role="pass"]', shell); const r = document.createRange(); r.selectNodeContents(n); const s = getSelection(); s.removeAllRanges(); s.addRange(r); }); return; }
+    if (k === 'menu' || k === 'review' || k === 'insta') {
+      D.logAct(k);
+      if (el.tagName !== 'A') D.say(k === 'menu' ? t.demoMenu(v.name) : k === 'review' ? t.demoReview(v.name) : t.demoInsta(v.name));
+      return;
+    }
+    if (k === 'toboard') { location.hash = 'board'; }
+  });
+  shell.addEventListener('keydown', e => { if (e.key === 'Escape' && D.sheet) D.open(''); });
+  return D;
+}
+
+/* ---------- staff board ---------- */
+function openRequests(now) { return S.requests.filter(r => (r.status === 'new' || r.status === 'ack') && now - r.createdAt < STALE_MS).sort((a, b) => a.createdAt - b.createdAt); }
+function boardHTML(inHub) {
+  const v = venue(), now = Date.now(), today = startOfDay(now);
+  const open = openRequests(now);
+  const todays = S.requests.filter(r => r.createdAt >= today);
+  const resp = todays.filter(r => r.ackAt && r.status !== 'void').map(r => r.ackAt - r.createdAt);
+  const scansToday = S.scans.filter(s => s.at >= today).length;
+  const issuesOpen = open.filter(r => r.kind === 'issue').length;
+  const handled = todays.filter(r => r.status === 'done' || r.status === 'void').sort((a, b) => (b.doneAt || 0) - (a.doneAt || 0));
+  const byTable = new Map();
+  open.forEach(r => { const cur = byTable.get(r.table); const rank = k => k === 'issue' ? 2 : 1; if (!cur || rank(r.kind) > rank(cur.kind) || (rank(r.kind) === rank(cur.kind) && r.createdAt < cur.createdAt)) byTable.set(r.table, r); });
+  const tiles = [];
+  for (let n = 1; n <= v.tables; n++) {
+    const r = byTable.get(n), anyNew = open.some(x => x.table === n && x.status === 'new');
+    const cls = 'tile' + (r ? ' k-' + r.kind : '') + (anyNew ? ' s-new' : '') + ((inHub ? S.hubTable : S.selTable) === n ? ' sel' : '');
+    const label = 'שולחן ' + n + (r ? ', ' + KIND_HE[r.kind] + (anyNew ? ', חדש' : ', בטיפול') : ', פנוי');
+    tiles.push('<button type="button" class="' + cls + '" data-table="' + n + '" aria-label="' + esc(label) + '">' + n + (r ? '<small class="age-plain" data-since="' + r.createdAt + '">' + mmss(now - r.createdAt) + '</small>' : '') + '</button>');
+  }
+  const ro = !canWrite();
+  const tickets = open.map(r => {
+    const fresh = S.freshIds && S.freshIds.has(r.id);
+    return '<article class="tk k-' + r.kind + (fresh ? ' in' : '') + (S.selTable === r.table && !inHub ? ' flash' : '') + '" data-id="' + esc(r.id) + '" data-t="' + r.table + '">' +
+      '<div class="tk-top"><span class="tk-t">שולחן ' + r.table + '</span><span class="pill' + (r.kind === 'issue' ? ' issue' : '') + '">' + esc(KIND_HE[r.kind]) + '</span></div>' +
+      (r.reason ? '<div class="tk-why">' + esc(REASON_HE[r.reason]) + '</div>' : '') +
+      (r.note ? '<div class="tk-note" dir="auto">"' + esc(r.note) + '"' + (r.lang !== 'he' ? '<small>נכתב ב' + esc(LANG_HE[r.lang]) + '</small>' : '') + '</div>' : (r.lang !== 'he' ? '<div class="tk-note"><small>הלקוח קורא ב' + esc(LANG_HE[r.lang]) + '</small></div>' : '')) +
+      '<div class="tk-meta"><span class="age" data-sla data-since="' + r.createdAt + '">' + mmss(now - r.createdAt) + '</span><span>' + hhmm(r.createdAt) + ' · ' + esc(SRC_HE[r.src]) + (r.sim ? ' · הדמיה' : '') + '</span>' +
+      '<span class="pill ' + (r.status === 'new' ? 'new' : 'muted') + '">' + (r.status === 'new' ? 'חדש' : 'בדרך') + '</span></div>' +
+      (ro ? '' : '<div class="tk-acts">' + (r.status === 'new' ? '<button type="button" data-do="ack">בדרך</button>' : '') + '<button type="button" class="solid" data-do="done">טופל</button><button type="button" class="ghost" data-do="void">לא רלוונטי</button></div>') +
+      '</article>';
+  }).join('');
+  const hl = handled.slice(0, 12).map(r => '<li><b>שולחן ' + r.table + '</b><span>' + esc(KIND_HE[r.kind]) + (r.reason ? ' · ' + esc(REASON_HE[r.reason]) : '') + '</span><span class="t">' + (r.status === 'void' ? 'לא רלוונטי' : 'תגובה ' + mmss((r.ackAt || r.doneAt) - r.createdAt)) + '</span><span class="t">' + hhmm(r.doneAt || r.createdAt) + '</span></li>').join('');
+  return '<div class="board">' +
+    '<div class="b-head"><h2>' + (inHub ? 'הלוח של הצוות' : esc(v.name)) + '<span class="clock" id="clock">' + hhmm(now) + '</span></h2>' +
+    '<div class="tools"><button type="button" class="tool" data-tool="sound" aria-pressed="' + S.soundOn + '">צליל ' + (S.soundOn ? 'פועל' : 'כבוי') + '</button>' +
+    (inHub ? '' : '<button type="button" class="tool" data-tool="wake" aria-pressed="' + !!(S.wake || S.wakeWanted) + '">מסך דלוק</button>') +
+    '<button type="button" class="tool go" data-tool="rush"' + (ro || S.rush ? ' disabled' : '') + '>' + (S.rush ? 'הדמיה רצה… ' + S.rush + '/4' : 'הדמיית עומס') + '</button></div></div>' +
+    '<div class="kpis"><div class="kpi' + (issuesOpen ? ' hot' : '') + '"><b>' + open.length + '</b><span>פתוחות עכשיו' + (issuesOpen ? ' · ' + issuesOpen + ' "לא בסדר"' : '') + '</span></div>' +
+    '<div class="kpi"><b>' + todays.length + '</b><span>פניות היום</span></div>' +
+    '<div class="kpi"><b>' + (resp.length ? mmss(avg(resp)) : '—') + '</b><span>זמן תגובה ממוצע היום</span></div>' +
+    '<div class="kpi"><b>' + scansToday + '</b><span>סריקות היום</span></div></div>' +
+    '<div class="floor" role="group" aria-label="מפת שולחנות">' + tiles.join('') + '</div>' +
+    '<div class="legend"><span><i></i>פנוי</span><span><i class="k-call"></i>קריאה או חשבון</span><span><i class="k-issue"></i>משהו לא בסדר</span><span><i class="s-new"></i>עוד לא ענו</span></div>' +
+    (open.length ? '<div class="queue" aria-live="polite">' + tickets + '</div>'
+      : '<div class="empty"><span>אין פניות פתוחות. כשלקוח ילחץ על כפתור בדף השולחן, הפנייה תודפס כאן עם מספר השולחן.</span>' + (ro ? '' : '<button type="button" class="btn" data-tool="rush"' + (S.rush ? ' disabled' : '') + '>הדמיית עומס: 4 פניות מכמה שולחנות</button>') + '</div>') +
+    '<details class="handled card"' + (S.openHandled ? ' open' : '') + '><summary>טופלו היום <span class="sub">' + handled.length + '</span></summary>' + (hl ? '<ul class="hlist">' + hl + '</ul>' : '<p class="note" style="margin-top:8px">עוד לא טופלו פניות היום.</p>') + '</details>' +
+    '</div>';
+}
+async function setStatus(id, status) {
+  const r = S.requests.find(x => x.id === id); if (!r || !canWrite()) return;
+  const now = Date.now(), patch = { status };
+  if (status === 'ack' && !r.ackAt) patch.ackAt = now;
+  if (status === 'done') { patch.doneAt = now; if (!r.ackAt) patch.ackAt = now; }
+  if (status === 'void') patch.doneAt = now;
+  try { await serial('req:' + id, () => write(() => S.store.updateRequest(id, patch))); } catch (e) { /* surfaced by write() */ }
+}
+async function rush() {
+  if (!canWrite() || S.rush) return;
+  const v = venue(), R = Math.random, notes = [['ru', 'cold', 'Суп остыл'], ['he', 'wait', 'מחכים לחשבון כבר עשר דקות'], ['en', 'wrong', 'We asked for oat milk'], ['ar', 'dirty', 'الطاولة تحتاج إلى تنظيف']];
+  const gaps = [0, 3500, 4500, 5000];
+  for (let i = 0; i < 4; i++) {
+    S.rush = i + 1; queueRender();
+    await sleep(gaps[i]);
+    const now = Date.now(), open = openRequests(now);
+    let table = 1 + Math.floor(R() * v.tables), kind = R() < 0.42 ? 'call' : R() < 0.6 ? 'bill' : 'issue';
+    for (let tries = 0; tries < 8 && open.some(r => r.table === table && r.kind === kind); tries++) table = 1 + Math.floor(R() * v.tables);
+    const n = notes[Math.floor(R() * notes.length)], lang = kind === 'issue' ? n[0] : LANGS[Math.floor(R() * 1.6)];
+    const src = R() < 0.64 ? 'nfc' : 'qr';
+    try {
+      await write(() => S.store.addScan({ table, at: now, src, lang, acts: [], sim: true }), true);
+      await write(() => S.store.addRequest({ table, kind, reason: kind === 'issue' ? n[1] : '', note: kind === 'issue' && R() < 0.75 ? n[2] : '', lang, src, status: 'new', createdAt: Date.now(), ackAt: 0, doneAt: 0, sim: true }), true);
+    } catch (e) { break; }
+  }
+  S.rush = 0; queueRender();
+}
+function beep(urgent) {
+  if (!audio) return;
+  try {
+    const t0 = audio.currentTime;
+    [0, 0.18].forEach((dt, i) => {
+      const o = audio.createOscillator(), g = audio.createGain();
+      o.type = 'sine'; o.frequency.value = urgent ? (i ? 660 : 880) : (i ? 990 : 740);
+      g.gain.setValueAtTime(0.0001, t0 + dt); g.gain.exponentialRampToValueAtTime(0.18, t0 + dt + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dt + 0.16);
+      o.connect(g).connect(audio.destination); o.start(t0 + dt); o.stop(t0 + dt + 0.18);
+    });
+  } catch (e) { /* audio is optional */ }
+}
+async function tool(name) {
+  if (name === 'rush') { rush(); return; }
+  if (name === 'sound') {
+    S.soundOn = !S.soundOn;
+    if (S.soundOn) { try { audio = audio || new (window.AudioContext || window.webkitAudioContext)(); await audio.resume(); beep(false); } catch (e) { S.soundOn = false; toast('הדפדפן לא מאפשר צליל בדף הזה.'); } }
+    render(); return;
+  }
+  if (name === 'wake') {
+    if (S.wake || S.wakeWanted) { S.wakeWanted = false; try { if (S.wake) await S.wake.release(); } catch (e) { /* already released */ } S.wake = null; render(); return; }
+    try { S.wake = await navigator.wakeLock.request('screen'); S.wakeWanted = true; S.wake.addEventListener('release', () => { S.wake = null; queueRender(); }); toast('המסך יישאר דלוק כל עוד הלוח פתוח.'); }
+    catch (e) { S.wake = null; S.wakeWanted = false; toast('המכשיר לא מאפשר להשאיר את המסך דלוק מתוך הדף.'); }
+    render();
+  }
+}
+
+/* ---------- owner report ---------- */
+function collect(range) {
+  const now = Date.now(), days = range === '1' ? 1 : range === '30' ? 30 : 7, start = startOfDay(now, days - 1), v = venue();
+  const scans = S.scans.filter(s => s.at >= start).map(s => Object.assign({}, s));
+  const reqs = S.requests.filter(r => r.createdAt >= start).map(r => Object.assign({}, r));
+  let sample = 0;
+  if (S.hist) {
+    for (const [d, m, t, src, mask] of S.hist.scans) {
+      const at = startOfDay(now, d) + m * 60000;
+      if (at >= start && t <= v.tables) { scans.push({ at, table: t, src: src ? 'qr' : 'nfc', acts: ACTS.filter((a, i) => mask & (1 << i)), sample: true }); sample++; }
+    }
+    for (const [d, m, t, k, rs, resp, st] of S.hist.reqs) {
+      const c = startOfDay(now, d) + m * 60000;
+      if (c >= start && t <= v.tables) { reqs.push({ createdAt: c, table: t, kind: KINDS[k], reason: rs ? REASONS[rs - 1] || '' : '', status: st ? 'void' : 'done', ackAt: st ? 0 : c + resp * 1000, doneAt: c + resp * 1000 + 45000, sample: true }); sample++; }
+    }
+  }
+  let first = Infinity;
+  scans.forEach(s => { first = Math.min(first, s.at); }); reqs.forEach(r => { first = Math.min(first, r.createdAt); });
+  const activeDays = first === Infinity ? 0 : Math.min(days, Math.round((startOfDay(now) - startOfDay(first)) / DAY) + 1);
+  return { now, days, start, activeDays, scans, reqs, sample, tables: v.tables };
+}
+function niceScale(maxV, steps) {
+  if (steps) { const step = steps.find(s => maxV / s <= 4) || steps[steps.length - 1]; return { step, max: Math.max(step, Math.ceil(maxV / step) * step) }; }
+  if (maxV <= 0) return { step: 1, max: 4 };
+  const raw = maxV / 4, p = Math.pow(10, Math.floor(Math.log10(raw))), f = raw / p;
+  const step = (f <= 1 ? 1 : f <= 2 ? 2 : f <= 5 ? 5 : 10) * p;
+  return { step, max: Math.ceil(maxV / step) * step };
+}
+function colChart(box, items, o) {
+  const W = Math.max(260, Math.floor(box.clientWidth || 480)), H = o.h || 190, pt = 14, pb = 24, ps = 40, pe = 4;
+  const maxV = Math.max(0, ...items.map(i => i.value || 0)), sc = niceScale(maxV, o.steps);
+  const ph = H - pt - pb, band = (W - ps - pe) / items.length, bw = Math.min(24, Math.max(4, band * 0.62));
+  const xc = i => W - ps - (i + 0.5) * band, y = val => pt + ph * (1 - val / sc.max);
+  let s = '';
+  for (let val = 0; val <= sc.max + 1e-9; val += sc.step) {
+    const yy = Math.round(y(val)) + 0.5;
+    s += '<line class="' + (val === 0 ? 'base' : 'gl') + '" x1="' + pe + '" x2="' + (W - ps) + '" y1="' + yy + '" y2="' + yy + '"/><text class="tx" x="' + (W - ps + 8) + '" y="' + (yy + 4) + '" text-anchor="start">' + esc(o.fmt ? o.fmt(val) : val) + '</text>';
+  }
+  const every = Math.max(1, Math.ceil(30 / band));
+  items.forEach((it, i) => {
+    const x = xc(i);
+    if (it.value > 0) {
+      const top = y(it.value), base = y(0), x0 = x - bw / 2, x1 = x + bw / 2, r = Math.min(4, bw / 2, base - top);
+      s += '<path class="bar" data-i="' + i + '" d="M' + x0 + ',' + base + 'L' + x0 + ',' + (top + r) + 'Q' + x0 + ',' + top + ' ' + (x0 + r) + ',' + top + 'L' + (x1 - r) + ',' + top + 'Q' + x1 + ',' + top + ' ' + x1 + ',' + (top + r) + 'L' + x1 + ',' + base + 'Z"/>';
+    }
+    if (i % every === 0) s += '<text class="tx" x="' + x + '" y="' + (H - 6) + '" text-anchor="middle">' + esc(it.label) + '</text>';
+    s += '<rect class="hit" data-i="' + i + '" x="' + (x - band / 2) + '" y="' + pt + '" width="' + band + '" height="' + ph + '" tabindex="0" aria-label="' + esc(it.name + ': ' + it.text) + '"/>';
+  });
+  box.innerHTML = '<svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" direction="ltr" role="img" aria-label="' + esc(o.aria) + '">' + s + '</svg><div class="tip" hidden><b></b><span></span></div>';
+  const tip = $('.tip', box);
+  const show = i => {
+    const it = items[i]; $$('.bar', box).forEach(b => b.classList.toggle('on', b.dataset.i === String(i)));
+    tip.firstChild.textContent = it.text; tip.lastChild.textContent = it.name; tip.hidden = false;
+    tip.style.left = Math.min(W - 70, Math.max(70, xc(i))) + 'px'; tip.style.top = (it.value > 0 ? y(it.value) : y(0)) + 'px';
+  };
+  const hide = () => { tip.hidden = true; $$('.bar', box).forEach(b => b.classList.remove('on')); };
+  $$('.hit', box).forEach(h => { const i = +h.dataset.i; h.addEventListener('pointerenter', () => show(i)); h.addEventListener('focus', () => show(i)); h.addEventListener('pointerleave', hide); h.addEventListener('blur', hide); });
+}
+function tableHTML(head, rows) { return '<div class="tbl-wrap"><table class="data"><thead><tr>' + head.map(h => '<th>' + esc(h) + '</th>').join('') + '</tr></thead><tbody>' + rows.map(r => '<tr>' + r.map(c => '<td>' + c + '</td>').join('') + '</tr>').join('') + '</tbody></table></div>'; }
+function renderReport(main) {
+  const C = collect(S.range), N = C.tables, AD = C.activeDays || 1;
+  const live = C.reqs.filter(r => r.status !== 'void');
+  const resp = live.filter(r => r.ackAt).map(r => (r.ackAt - r.createdAt) / 1000);
+  const issues = C.reqs.filter(r => r.kind === 'issue');
+  const issuesFast = issues.filter(r => r.ackAt && r.ackAt - r.createdAt <= 300000).length;
+  const reviews = C.scans.filter(s => s.acts && s.acts.includes('review')).length;
+  const nfc = C.scans.filter(s => s.src === 'nfc').length, qr = C.scans.filter(s => s.src === 'qr').length;
+  const byKind = k => C.reqs.filter(r => r.kind === k).length;
+  const perTableDay = C.scans.length / N / AD, perTableWeek = live.length / N / (AD / 7);
+  const hours = []; for (let h = 7; h <= 23; h++) hours.push(h);
+  const hourOf = ts => Math.min(23, Math.max(7, new Date(ts).getHours()));
+  const scanH = hours.map(h => C.scans.filter(s => hourOf(s.at) === h).length);
+  const respH = hours.map(h => { const a = live.filter(r => r.ackAt && hourOf(r.createdAt) === h).map(r => (r.ackAt - r.createdAt) / 1000); return a.length ? avg(a) : 0; });
+  const rows = [];
+  let maxScans = 0;
+  for (let n = 1; n <= N; n++) { const sc = C.scans.filter(s => s.table === n).length; maxScans = Math.max(maxScans, sc); rows.push(n); }
+  const tableRows = rows.map(n => {
+    const sc = C.scans.filter(s => s.table === n).length, rq = C.reqs.filter(r => r.table === n);
+    const rs = rq.filter(r => r.ackAt && r.status !== 'void').map(r => (r.ackAt - r.createdAt) / 1000);
+    const low = C.activeDays && sc / AD < 0.5;
+    return ['<span class="tn">' + n + '</span>', '<span class="sbar"><i style="width:' + (maxScans ? Math.round(sc / maxScans * 90) : 0) + 'px"></i>' + sc + '</span>',
+      fmt1(sc / AD), rq.length, rq.filter(r => r.kind === 'issue').length, rs.length ? mmss(avg(rs) * 1000) : '—', low ? '<span class="flag">מעט סריקות</span>' : ''];
+  });
+  const reasonCounts = REASONS.map(r => ({ r, n: issues.filter(x => x.reason === r).length })).filter(x => x.n);
+  const unspecified = issues.filter(x => !x.reason).length;
+  const rmax = Math.max(1, ...reasonCounts.map(x => x.n), unspecified);
+  const gate = (ok, label, val, why) => '<div class="gate"><span class="' + (ok === null ? 'na' : ok ? 'ok' : 'no') + '">' + svgIcon(ok === null ? 'na' : ok ? 'ok' : 'warn') + '</span><b>' + esc(label) + '</b><span class="val">' + val + '</span><span class="why">' + why + '</span></div>';
+  const has = C.scans.length + C.reqs.length > 0;
+  const periodTxt = C.days === 1 ? 'היום, ' + dmy(C.now) : dmy(C.start) + ' עד ' + dmy(C.now);
+  main.innerHTML = '<div class="view report">' +
+    '<div class="filters"><div class="seg" role="group" aria-label="תקופה">' + [['1', 'היום'], ['7', '7 ימים'], ['30', '30 יום']].map(([k, l]) => '<button type="button" data-range="' + k + '" aria-pressed="' + (S.range === k) + '">' + l + '</button>').join('') + '</div>' +
+    '<span class="period">' + periodTxt + ' · ' + N + ' שולחנות</span>' + (C.sample ? '<span class="samplechip">כולל נתוני דוגמה של שבוע</span>' : '') + '</div>' +
+    (!has ? '<div class="empty"><span>עוד אין נתונים לתקופה הזו. שלחו קריאה מדף השולחן, או טענו שבוע לדוגמה בהגדרות.</span><button type="button" class="btn" data-goto="setup">להגדרות</button></div>' :
+    '<div class="stats">' +
+      '<div class="stat"><span class="l">סריקות</span><span class="v">' + C.scans.length.toLocaleString('he-IL') + '</span><span class="s">' + fmt1(perTableDay) + ' לשולחן ביום</span></div>' +
+      '<div class="stat"><span class="l">פניות</span><span class="v">' + C.reqs.length + '</span><span class="s">' + byKind('call') + ' קריאות · ' + byKind('bill') + ' חשבון · ' + byKind('issue') + ' "לא בסדר"</span></div>' +
+      '<div class="stat"><span class="l">זמן תגובה ממוצע</span><span class="v">' + (resp.length ? mmss(avg(resp) * 1000) : '—') + '</span><span class="s">' + (resp.length ? 'חציון ' + mmss(median(resp) * 1000) + ' · מהלחיצה ועד "בדרך"' : 'עוד אין פניות שטופלו') + '</span></div>' +
+      '<div class="stat"><span class="l">"משהו לא בסדר"</span><span class="v">' + issues.length + '</span><span class="s">' + (issues.length ? Math.round(issuesFast / issues.length * 100) + '% קיבלו מענה תוך 5 דק׳' : 'אף דיווח בתקופה') + '</span></div>' +
+      '<div class="stat"><span class="l">לחיצות על "דרגו אותנו"</span><span class="v">' + reviews + '</span><span class="s">' + (C.scans.length ? Math.round(reviews / C.scans.length * 100) + '% מהסריקות. לחיצה היא לא בהכרח ביקורת.' : '—') + '</span></div>' +
+    '</div>' +
+    '<div class="cards2">' +
+      '<div class="card"><div class="chead"><div><h3>מתי השולחנות פעילים</h3><p class="sub">סריקות לפי שעה ביום</p></div><button type="button" class="tview" data-tview="h1">טבלה</button></div><div class="viz" id="vizH1"></div><div data-twin="h1" hidden>' +
+        tableHTML(['שעה', 'סריקות'], hours.map((h, i) => [h + ':00', scanH[i]])) + '</div></div>' +
+      '<div class="card"><div class="chead"><div><h3>זמן תגובה לפי שעה</h3><p class="sub">ממוצע, מהלחיצה ועד "בדרך"</p></div><button type="button" class="tview" data-tview="h2">טבלה</button></div><div class="viz" id="vizH2"></div><div data-twin="h2" hidden>' +
+        tableHTML(['שעה', 'זמן תגובה ממוצע'], hours.map((h, i) => [h + ':00', respH[i] ? mmss(respH[i] * 1000) : '—'])) + '</div></div>' +
+    '</div>' +
+    '<div class="cards2">' +
+      '<div class="card"><div class="chead"><div><h3>לפי שולחן</h3><p class="sub">שולחן עם פחות מחצי סריקה ביום מסומן. כנראה שהסטנד במקום לא טוב.</p></div></div>' +
+        tableHTML(['שולחן', 'סריקות', 'ביום', 'פניות', '"לא בסדר"', 'תגובה', ''], tableRows) + '</div>' +
+      '<div class="card"><div class="chead"><div><h3>מה חוזר ב"משהו לא בסדר"</h3><p class="sub">' + issues.length + ' דיווחים בתקופה</p></div></div>' +
+        (issues.length ? '<div class="hbars">' + reasonCounts.map(x => '<div class="hrow"><span>' + esc(REASON_HE[x.r]) + '</span><span class="htrack"><i style="width:' + (x.n / rmax * 100) + '%"></i></span><b>' + x.n + '</b></div>').join('') +
+          (unspecified ? '<div class="hrow"><span>בלי פירוט</span><span class="htrack"><i style="width:' + (unspecified / rmax * 100) + '%"></i></span><b>' + unspecified + '</b></div>' : '') + '</div>' : '<p class="note">אף דיווח בתקופה.</p>') +
+        '<div style="margin-top:22px"><h3>הצמדה או סריקה</h3><p class="sub">איך לקוחות פותחים את הדף</p>' +
+        (nfc + qr ? '<div class="meter" role="img" aria-label="NFC ' + Math.round(nfc / (nfc + qr) * 100) + '%, QR ' + Math.round(qr / (nfc + qr) * 100) + '%"><i style="width:' + (nfc / (nfc + qr) * 100) + '%"></i><i style="width:' + (qr / (nfc + qr) * 100) + '%"></i></div><p class="note">הצמדת NFC ' + Math.round(nfc / (nfc + qr) * 100) + '% (' + nfc + ') · סריקת QR ' + Math.round(qr / (nfc + qr) * 100) + '% (' + qr + ')</p>' : '<p class="note">עוד אין סריקות מסטנדים.</p>') + '</div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="card"><h3>מדדי הפיילוט</h3><p class="sub">לפי שער ההחלטה של יום 60 בתוכנית העסקית. פנימי, לא חלק מהדוח לבעל העסק.</p><div class="gates">' +
+      gate(C.activeDays ? perTableDay >= 0.5 : null, 'סריקות לשולחן ביום', fmt1(perTableDay), 'יעד: 0.5 ומעלה. פחות מזה: בודקים מיקום, עיצוב ומשפט הנעה לפני שמוותרים.') +
+      gate(C.activeDays ? perTableWeek >= 1 : null, 'אירועים בערוץ החי, לשולחן בשבוע', fmt1(perTableWeek), 'יעד: 1 ומעלה, או בעל בית שמסתכל בלוח כל יום.') +
+      gate(null, 'פיילוטים שממשיכים בתשלום', '—', 'יעד: 2 מתוך 3, ב-89 ₪ ומעלה. נמדד מחוץ למערכת.') +
+      gate(null, 'סגירה מסטנדי דוגמה ברחוב', '—', 'יעד: 15% ומעלה. נמדד מחוץ למערכת.') +
+    '</div></div>') +
+    '</div>';
+  if (has) {
+    colChart($('#vizH1', main), hours.map((h, i) => ({ label: String(h), name: h + ':00-' + (h + 1) + ':00', value: scanH[i], text: scanH[i] + ' סריקות' })), { aria: 'סריקות לפי שעה', h: 190 });
+    colChart($('#vizH2', main), hours.map((h, i) => ({ label: String(h), name: h + ':00-' + (h + 1) + ':00', value: respH[i], text: respH[i] ? mmss(respH[i] * 1000) + ' דק׳' : 'אין פניות' })), { aria: 'זמן תגובה ממוצע לפי שעה', h: 190, fmt: v => mmss(v * 1000), steps: [30, 60, 120, 180, 300, 600] });
+  }
+}
+
+/* ---------- setup ---------- */
+function qrSvg(text, size) {
+  if (typeof window.qrcode !== 'function' || !text) return '<div class="note">' + (text ? 'קוד ה-QR לא נטען.' : 'הקישור יופיע אחרי הפרסום.') + '</div>';
+  const q = window.qrcode(0, 'M'); q.addData(text); q.make();
+  const n = q.getModuleCount(), m = 4, t = n + 2 * m; let d = '';
+  for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (q.isDark(r, c)) d += 'M' + (c + m) + ' ' + (r + m) + 'h1v1h-1z';
+  return '<svg class="qr" viewBox="0 0 ' + t + ' ' + t + '" width="' + size + '" height="' + size + '" shape-rendering="crispEdges" role="img" aria-label="קוד QR"><rect width="' + t + '" height="' + t + '" fill="#FFFFFF"/><path d="' + d + '" fill="#000000"/></svg>';
+}
+function readLogo(file) {
+  return new Promise((res, rej) => {
+    if (!file || !/^image\/(png|jpeg|webp|gif|svg\+xml)$/.test(file.type)) { rej(new Error('type')); return; }
+    if (file.size > 8e6) { rej(new Error('size')); return; }
+    const fr = new FileReader();
+    fr.onerror = () => rej(fr.error);
+    fr.onload = () => {
+      const img = new Image();
+      img.onerror = () => rej(new Error('decode'));
+      img.onload = () => {
+        const w = img.naturalWidth || 192, h = img.naturalHeight || 192, s = Math.min(1, 192 / Math.max(w, h));
+        const c = document.createElement('canvas'); c.width = Math.max(1, Math.round(w * s)); c.height = Math.max(1, Math.round(h * s));
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        let url = c.toDataURL('image/webp', 0.86);
+        if (!/^data:image\/webp/.test(url)) url = c.toDataURL('image/png');
+        if (url.length > 200000) url = c.toDataURL('image/jpeg', 0.8);
+        res(url);
+      };
+      img.src = fr.result;
+    };
+    fr.readAsDataURL(file);
+  });
+}
+function setupHTML() {
+  const d = S.draft, ro = !canWrite();
+  const field = (id, label, val, extra) => '<div class="field"><label for="' + id + '">' + label + '</label><input id="' + id + '" ' + (extra || 'type="text"') + ' value="' + esc(val) + '"' + (ro ? ' disabled' : '') + '><span class="err" data-err="' + id + '" hidden></span></div>';
+  return '<div class="view">' +
+    '<div class="setup"><form class="card form" id="venueForm" novalidate>' +
+      '<div><h2>המקום</h2><p class="sub">מה שתשמרו כאן מתעדכן מיד בכל דפי השולחנות ובכל המכשירים שמחוברים.</p></div>' +
+      '<div class="fgrid">' + field('f_name', 'שם המקום', d.name, 'type="text" maxlength="40"') + field('f_tables', 'מספר שולחנות', d.tables, 'type="number" min="1" max="40" inputmode="numeric"') + '</div>' +
+      '<div class="field"><span class="flabel">צבע המותג</span><div class="swatches" role="group" aria-label="צבע המותג">' +
+        SWATCHES.map(c => '<button type="button" class="sw" data-color="' + c + '" style="background:' + c + '" aria-label="צבע ' + c + '" aria-pressed="' + (d.color.toLowerCase() === c.toLowerCase()) + '"' + (ro ? ' disabled' : '') + '></button>').join('') +
+        '<input type="color" id="f_color" value="' + esc(d.color) + '" aria-label="צבע אחר"' + (ro ? ' disabled' : '') + '></div></div>' +
+      '<div class="field"><span class="flabel">לוגו</span><div class="logo-row">' + (d.logo ? '<div class="d-logo img"><img alt="" src="' + esc(d.logo) + '"></div>' : '<div class="d-logo" style="background:' + esc(d.color) + ';color:' + inkFor(d.color) + '">' + esc(initials(d.name)) + '</div>') +
+        '<input class="sr-file" type="file" id="f_logo" accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml"' + (ro ? ' disabled' : '') + '><label class="btn" for="f_logo">העלאת לוגו</label>' + (d.logo ? '<button type="button" class="btn" id="f_logo_rm"' + (ro ? ' disabled' : '') + '>הסרה</button>' : '') +
+        '<span class="note">בלי לוגו מוצגות האותיות הראשונות של השם.</span></div></div>' +
+      '<div><h3>וויפיי לאורחים</h3></div><div class="fgrid">' + field('f_ssid', 'שם הרשת', d.wifi.ssid, 'type="text" dir="ltr" maxlength="40"') + field('f_pass', 'סיסמה', d.wifi.pass, 'type="text" dir="ltr" maxlength="64"') + '</div>' +
+      '<div><h3>קישורים</h3><p class="sub">קישור ריק מציג הודעת הדגמה במקום לפתוח דף.</p></div>' +
+      field('f_menu', 'תפריט', d.links.menu, 'type="url" dir="ltr" placeholder="https://"') + field('f_review', 'דף הביקורות בגוגל', d.links.review, 'type="url" dir="ltr" placeholder="https://"') + field('f_insta', 'אינסטגרם', d.links.insta, 'type="url" dir="ltr" placeholder="https://"') +
+      '<div><h3>כפתורים בדף השולחן</h3><p class="sub">אפשר להתחיל רק עם "משהו לא בסדר" ולהוסיף קריאה למלצר כשהצוות מוכן. כפתור שמופעל מוצג לכל לקוח באותה צורה, כולל כפתור הביקורת.</p></div>' +
+      '<div class="checks">' + Object.keys(BTN_HE).map(k => '<label><input type="checkbox" id="b_' + k + '" data-btn="' + k + '"' + (d.buttons[k] ? ' checked' : '') + (ro ? ' disabled' : '') + '>' + BTN_HE[k] + '</label>').join('') + '</div>' +
+      '<div class="form-actions"><button type="submit" class="btn solid" id="f_save"' + (ro ? ' disabled' : '') + '>שמירה</button><span id="f_msg" role="status">' + (ro ? 'צפייה בלבד: אין הרשאה לשמור.' : S.dirty ? 'יש שינויים שלא נשמרו.' : '') + '</span></div>' +
+    '</form>' +
+    '<div class="preview-col"><div class="handset small"><div class="screen"><div class="d-shell" id="previewShell"></div></div></div><p class="caption">תצוגה מקדימה של שולחן 7, לפני שמירה.</p></div></div>' +
+    '<section class="card"><h2>תוויות לשולחנות</h2><p class="sub">לכל שולחן שני קישורים: אחד נכתב לצ׳יפ ה-NFC, והשני מודפס כקוד QR. כך הדוח יודע איך כל לקוח הגיע. כדי לשלוח מהטלפון צריך להיות מחוברים ל-Claude עם הרשאת עריכה לדף.</p>' +
+      '<div class="labels" id="labels"></div></section>' +
+    '<section class="card" id="datatools"></section>' +
+    '</div>';
+}
+function labelsHTML() {
+  const v = venue(), out = [];
+  if (!ARTIFACT_URL) return '<p class="note">הקישורים לשולחנות יופיעו אחרי הפרסום הבא של הדף.</p>';
+  for (let n = 1; n <= v.tables; n++) {
+    out.push('<div class="label"><b>' + esc(v.name) + '</b><span class="sub">שולחן ' + n + '</span>' + qrSvg(linkFor(n, 'qr'), 112) +
+      '<div class="row"><button type="button" data-copy="' + esc(linkFor(n, 'nfc')) + '">קישור ל-NFC</button><a href="' + esc(linkFor(n, 'nfc')) + '" target="_blank" rel="noopener">פתיחה</a></div></div>');
+  }
+  return out.join('');
+}
+function dataToolsHTML() {
+  const ro = !canWrite(), h = S.hist;
+  const nReq = S.requests.length, nScan = S.scans.length;
+  return '<h2>נתונים</h2>' +
+    '<div class="datarow"><p>' + (h ? '<b>נתוני דוגמה טעונים:</b> שבוע של ' + h.tables + ' שולחנות, ' + h.scans.length + ' סריקות ו-' + h.reqs.length + ' פניות. הם מופיעים בדוח בלבד, תמיד כ"שבוע שעבר", ומסומנים כדוגמה.' : '<b>אין נתוני דוגמה.</b> אפשר לטעון שבוע לדוגמה כדי לראות איך נראה הדוח.') + '</p>' +
+      (h ? '<button type="button" class="btn" data-data="clearsample"' + (ro || S.busy ? ' disabled' : '') + '>הסרת נתוני הדוגמה</button>' : '<button type="button" class="btn solid" data-data="loadsample"' + (ro || S.busy ? ' disabled' : '') + '>טעינת שבוע לדוגמה</button>') + '</div>' +
+    '<div class="datarow"><p><b>מההדגמה החיה:</b> ' + nReq + ' פניות ו-' + nScan + ' סריקות מ-30 הימים האחרונים. מחיקה מוחקת אותן מכל המכשירים.' + (S.busy ? ' <span class="note">' + esc(S.busy) + '</span>' : '') + '</p>' +
+      (S.confirmReset ? '<span class="form-actions"><button type="button" class="btn danger solid" data-data="reset"' + (S.busy ? ' disabled' : '') + '>כן, למחוק הכול</button><button type="button" class="btn" data-data="cancelreset">ביטול</button></span>'
+        : '<button type="button" class="btn danger" data-data="askreset"' + (ro || S.busy || !(nReq + nScan) ? ' disabled' : '') + '>מחיקת הפניות והסריקות</button>') + '</div>' +
+    '<div class="datarow"><p class="note">מי יכול לשלוח ולעדכן: בעלי הדף ומי שהוזמן אליו כעורך. מי שהוזמן מחוץ לארגון יכול לכתוב רק כל עוד הדף לא משותף בקישור ציבורי. מי שלא מחובר רואה את ההדגמה במצב מקומי, ומי שיש לו הרשאת צפייה בלבד רואה את הנתונים בלי לשנות אותם.</p></div>';
+}
+function readForm() {
+  const d = S.draft, f = id => $('#' + id);
+  if (!f('f_name')) return;
+  d.name = f('f_name').value.slice(0, 40); d.tables = f('f_tables').value;
+  d.wifi.ssid = f('f_ssid').value.slice(0, 40); d.wifi.pass = f('f_pass').value.slice(0, 64);
+  d.links.menu = f('f_menu').value.trim(); d.links.review = f('f_review').value.trim(); d.links.insta = f('f_insta').value.trim();
+  $$('[data-btn]').forEach(c => { d.buttons[c.dataset.btn] = c.checked; });
+}
+function renderPreview() {
+  const box = $('#previewShell'); if (!box) return;
+  const p = cleanVenue(Object.assign({}, S.draft, { links: { menu: '', review: '', insta: '' }, tables: int(S.draft.tables, 1, 40) || 12 }));
+  if (!(S.draft.name || '').trim()) p.name = '…';
+  box.innerHTML = dinerHTML(p, 'he', 7, { preview: true });
+}
+function mountSetup(main) {
+  if (!S.dirty || !S.draft) S.draft = JSON.parse(JSON.stringify(venue()));
+  main.innerHTML = setupHTML();
+  $('#labels').innerHTML = labelsHTML();
+  $('#datatools').innerHTML = dataToolsHTML();
+  renderPreview();
+  const form = $('#venueForm');
+  form.addEventListener('input', e => {
+    if (e.target.id === 'f_color') { S.draft.color = e.target.value; $$('.sw').forEach(s => s.setAttribute('aria-pressed', String(s.dataset.color.toLowerCase() === e.target.value.toLowerCase()))); }
+    readForm(); S.dirty = true; $('#f_msg').textContent = 'יש שינויים שלא נשמרו.'; renderPreview();
+  });
+  form.addEventListener('change', async e => {
+    if (e.target.id !== 'f_logo') return;
+    const file = e.target.files && e.target.files[0]; e.target.value = '';
+    try { S.draft.logo = await readLogo(file); readForm(); S.dirty = true; mountSetup(main); $('#f_msg').textContent = 'הלוגו נטען. לחצו על שמירה.'; }
+    catch (er) { toast('לא הצלחנו לקרוא את הקובץ. נסו PNG או JPG.'); }
+  });
+  form.addEventListener('click', e => {
+    const sw = e.target.closest('.sw');
+    if (sw) { readForm(); S.draft.color = sw.dataset.color; S.dirty = true; $('#f_color').value = sw.dataset.color; $$('.sw').forEach(s => s.setAttribute('aria-pressed', String(s === sw))); $('#f_msg').textContent = 'יש שינויים שלא נשמרו.'; renderPreview(); return; }
+    if (e.target.id === 'f_logo_rm') { readForm(); S.draft.logo = ''; S.dirty = true; mountSetup(main); }
+  });
+  form.addEventListener('submit', async e => {
+    e.preventDefault(); if (!canWrite()) return;
+    readForm();
+    const errs = {};
+    if (!S.draft.name.trim()) errs.f_name = 'צריך שם למקום.';
+    if (!int(S.draft.tables, 1, 40)) errs.f_tables = 'מספר בין 1 ל-40.';
+    for (const [id, k] of [['f_menu', 'menu'], ['f_review', 'review'], ['f_insta', 'insta']]) if (S.draft.links[k] && !isHttps(S.draft.links[k])) errs[id] = 'הקישור צריך להתחיל ב-https://';
+    $$('[data-err]').forEach(x => { x.hidden = !errs[x.dataset.err]; x.textContent = errs[x.dataset.err] || ''; });
+    if (Object.keys(errs).length) { $('#f_msg').textContent = 'יש שדות לתקן.'; return; }
+    const clean = cleanVenue(Object.assign({}, S.draft, { tables: int(S.draft.tables, 1, 40) }));
+    clean.updatedAt = Date.now();
+    $('#f_save').disabled = true; $('#f_msg').textContent = 'שומר…';
+    try { await write(() => S.store.saveVenue(clean)); S.dirty = false; $('#f_msg').textContent = 'נשמר. כל המכשירים המחוברים מתעדכנים.'; }
+    catch (er) { $('#f_msg').textContent = 'השמירה לא הצליחה.'; }
+    $('#f_save').disabled = !canWrite();
+  });
+  main.dataset.setupSig = JSON.stringify([venue(), canWrite()]);
+}
+async function dataAction(a) {
+  if (a === 'askreset') { S.confirmReset = true; render(); return; }
+  if (a === 'cancelreset') { S.confirmReset = false; render(); return; }
+  if (!canWrite()) return;
+  if (a === 'loadsample') { S.busy = 'טוען…'; render(); try { await write(() => S.store.setHistory(genSample(venue().tables, Date.now() % 100000))); toast('נטען שבוע לדוגמה. הוא מופיע בדוח.'); } catch (e) { /* surfaced */ } S.busy = ''; render(); return; }
+  if (a === 'clearsample') { S.busy = 'מסיר…'; render(); try { await write(() => S.store.clearHistory()); toast('נתוני הדוגמה הוסרו.'); } catch (e) { /* surfaced */ } S.busy = ''; render(); return; }
+  if (a === 'reset') {
+    S.confirmReset = false; S.busy = 'מוחק…'; render();
+    try { const n = await S.store.resetLive((d, t) => { S.busy = 'נמחקו ' + d + ' מתוך ' + t; const box = $('#datatools'); if (box) box.innerHTML = dataToolsHTML(); }); toast('נמחקו ' + n + ' רשומות.'); }
+    catch (e) { writeFailed(e); }
+    S.busy = ''; render();
+  }
+}
+
+/* ---------- render ---------- */
+function renderChrome() {
+  $$('.tab').forEach(b => b.setAttribute('aria-current', b.dataset.view === S.view ? 'page' : 'false'));
+  const c = $('#conn'), map = { connecting: 'מתחבר…', live: 'מחובר · בזמן אמת', local: 'מצב מקומי', readonly: 'צפייה בלבד', offline: 'מנותק' };
+  c.className = 'conn ' + S.mode; c.lastChild.textContent = map[S.mode];
+  const b = $('#banner'), msg = {
+    local: '<b>מצב מקומי.</b><span>הלחיצות נשמרות רק בחלון הזה ולא עוברות בין מכשירים. כדי לעבוד מול בסיס הנתונים המשותף, פתחו את הדף כשאתם מחוברים לחשבון Claude עם הרשאת עריכה.</span>',
+    readonly: '<b>צפייה בלבד.</b><span>רואים את הנתונים בזמן אמת, אבל אי אפשר לשלוח או לעדכן. כדי לקבל הרשאה, בקשו מבעלי הדף הזמנה כעורכים.</span>',
+    offline: '<b>החיבור לבסיס הנתונים נותק.</b><span>רעננו את הדף כדי להתחבר מחדש.</span>'
+  }[S.mode];
+  b.hidden = !msg; if (msg) b.innerHTML = msg;
+}
+function render() {
+  if (S.solo) {
+    if (!soloDiner) return;
+    if (!S.venueLoaded && S.mode === 'connecting') return;
+    soloDiner.mount(false);
+    return;
+  }
+  renderChrome();
+  const main = $('#main');
+  if (main.dataset.view !== S.view) { main.dataset.view = S.view; main.innerHTML = ''; hubDiner = null; delete main.dataset.setupSig; }
+  if (S.view === 'demo') {
+    if (!$('#hubPhone', main)) {
+      main.innerHTML = '<div class="view"><div class="intro"><div><h1>הדגמה חיה, מול בסיס נתונים אמיתי</h1><p>כל לחיצה בטלפון נשמרת בבסיס הנתונים של הדף, והלוח של הצוות קורא אותה בזמן אמת. פתחו את אותו קישור במכשיר נוסף, וכל לחיצה ועדכון יופיעו בשניהם.</p></div><div id="qrmini"></div></div>' +
+        '<div class="hub"><div class="phonecol"><div class="seat"><span>הלקוח יושב בשולחן</span><button type="button" data-seat="-1" aria-label="שולחן קודם">−</button><b id="seatNum"></b><button type="button" data-seat="1" aria-label="שולחן הבא">+</button></div>' +
+        '<div class="handset"><div class="screen"><div class="d-shell" id="hubPhone"><div class="d-skel">טוען את דף השולחן…</div></div></div></div><p class="caption">זה הדף שנפתח ללקוח כשהוא מצמיד את הטלפון לסטנד. נסו כפתור, ואז "בדרך" בלוח.</p></div>' +
+        '<div id="hubBoard"></div></div></div>';
+    }
+    const v = venue(); S.hubTable = Math.min(S.hubTable, v.tables);
+    $('#seatNum').textContent = S.hubTable;
+    const qm = $('#qrmini');
+    if (qm && !qm.dataset.done && ARTIFACT_URL && typeof window.qrcode === 'function') { qm.dataset.done = '1'; qm.innerHTML = '<div class="qrmini">' + qrSvg(linkFor(7, 'qr'), 92) + '<span>סרקו מהטלפון כדי לשבת בשולחן 7. הלחיצות שלכם יופיעו בלוח כאן.</span></div>'; }
+    if (S.venueLoaded) {
+      if (!hubDiner) hubDiner = makeDiner($('#hubPhone'), 'hub', S.hubTable, 'demo');
+      hubDiner.table = S.hubTable; hubDiner.mount(false);
+    }
+    $('#hubBoard').innerHTML = boardHTML(true);
+  } else if (S.view === 'board') {
+    main.innerHTML = '<div class="view">' + boardHTML(false) + '</div>';
+  } else if (S.view === 'report') {
+    renderReport(main);
+  } else if (S.view === 'setup') {
+    const sig = JSON.stringify([venue(), canWrite()]);
+    if (!$('#venueForm', main) || (!S.dirty && main.dataset.setupSig !== sig)) mountSetup(main);
+    else { $('#labels').innerHTML = labelsHTML(); $('#datatools').innerHTML = dataToolsHTML(); }
+  }
+  S.freshIds = null;
+}
+function tick() {
+  const now = Date.now();
+  $$('[data-since]').forEach(e => {
+    const ms = now - (+e.dataset.since); e.textContent = mmss(ms);
+    if (e.hasAttribute('data-sla')) { e.classList.toggle('warn', ms >= 120000 && ms < 300000); e.classList.toggle('late', ms >= 300000); }
+  });
+  const c = $('#clock'); if (c) c.textContent = hhmm(now);
+  [hubDiner, soloDiner].forEach(D => { if (D && D.hasDone) D.refresh(); });
+}
+
+/* ---------- events ---------- */
+document.addEventListener('click', e => {
+  const tab = e.target.closest('.tab[data-view]'); if (tab) { setView(tab.dataset.view); return; }
+  const go = e.target.closest('[data-goto]'); if (go) { setView(go.dataset.goto); return; }
+  if (S.solo) return;
+  const act = e.target.closest('[data-do]');
+  if (act) { const tk = act.closest('.tk'); if (tk) setStatus(tk.dataset.id, act.dataset.do); return; }
+  const tl = e.target.closest('[data-tool]'); if (tl) { tool(tl.dataset.tool); return; }
+  const seat = e.target.closest('[data-seat]');
+  if (seat) { const n = venue().tables; S.hubTable = ((S.hubTable - 1 + (+seat.dataset.seat) + n) % n) + 1; render(); return; }
+  const tile = e.target.closest('.tile[data-table]');
+  if (tile) {
+    const n = +tile.dataset.table;
+    if (S.view === 'demo') { S.hubTable = n; render(); }
+    else { S.selTable = S.selTable === n ? 0 : n; render(); const first = $('.tk[data-t="' + n + '"]'); if (first) first.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
+    return;
+  }
+  const rg = e.target.closest('[data-range]'); if (rg) { S.range = rg.dataset.range; render(); return; }
+  const tv = e.target.closest('[data-tview]');
+  if (tv) { const card = tv.closest('.card'), twin = $('[data-twin="' + tv.dataset.tview + '"]', card), viz = $('.viz', card); const toTable = twin.hidden; twin.hidden = !toTable; viz.hidden = toTable; tv.textContent = toTable ? 'תרשים' : 'טבלה'; return; }
+  const da = e.target.closest('[data-data]'); if (da) { dataAction(da.dataset.data); return; }
+  const cp = e.target.closest('[data-copy]');
+  if (cp) { copyText(cp.dataset.copy, () => toast('הקישור הועתק. אפשר לכתוב אותו לצ׳יפ באפליקציית NFC.'), () => toast(cp.dataset.copy)); }
+});
+document.addEventListener('toggle', e => { if (e.target.classList && e.target.classList.contains('handled')) S.openHandled = e.target.open; }, true);
+let resizeT = 0;
+window.addEventListener('resize', () => { clearTimeout(resizeT); resizeT = setTimeout(() => { if (S.view === 'report' && !S.solo) render(); }, 200); });
+window.addEventListener('hashchange', () => { const was = !!S.solo; parseHash(); if (was !== !!S.solo) { location.reload(); return; } render(); });
+document.addEventListener('visibilitychange', async () => { if (document.visibilityState === 'visible' && S.wakeWanted && !S.wake) { try { S.wake = await navigator.wakeLock.request('screen'); } catch (e) { /* optional */ } } });
+
+/* ---------- start ---------- */
+parseHash();
+if (S.solo) {
+  $('#app').hidden = true;
+  const solo = $('#solo'); solo.hidden = false;
+  solo.innerHTML = '<div class="d-shell standalone" id="soloShell"><div class="d-skel">טוען…</div></div>';
+  soloDiner = makeDiner($('#soloShell'), 'solo', S.solo.table, S.solo.src);
+} else {
+  render();
+}
+connect();
+setInterval(tick, 1000);
+})();
+</script>

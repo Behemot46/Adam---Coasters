@@ -1,0 +1,558 @@
+<title>קרוב לשולחן</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Secular+One&family=Assistant:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Layout: headline beside a two-way demo (diner phone <-> owner's ticket rail); then steps, a thermal-paper monthly report, install kit, per-table plans with calculator, Google rules, FAQ, contact. RTL throughout. */
+:root{
+  --bg:#F2F5F3;        /* cool laminate table */
+  --surface:#FFFFFF;
+  --ink:#16201C;
+  --muted:#56645E;
+  --line:#D3DCD7;
+  --teal:#0F5C4A;      /* brand */
+  --teal-ink:#FFFFFF;
+  --teal-soft:#DCEBE5;
+  --yolk:#F2C14E;      /* "new" signal */
+  --yolk-ink:#3A2B00;
+  --yolk-soft:#FBEFC9;
+  --ticket:#FFFDF6;    /* thermal paper */
+  --alert:#B23A2A;
+  --alert-ink:#FFFFFF;
+  --display:"Secular One","Assistant","Arial Hebrew",Arial,sans-serif;
+  --body:"Assistant","Heebo","Segoe UI",Arial,sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F1513; --surface:#18211D; --ink:#E6EEEA; --muted:#9AABA3; --line:#2B3833;
+    --teal:#4FB394; --teal-ink:#0B1411; --teal-soft:#1B3029; --yolk:#E9B949; --yolk-ink:#2E2200; --yolk-soft:#3A3320;
+    --ticket:#22201A; --alert:#E77B69; --alert-ink:#2A0D08; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F1513; --surface:#18211D; --ink:#E6EEEA; --muted:#9AABA3; --line:#2B3833;
+  --teal:#4FB394; --teal-ink:#0B1411; --teal-soft:#1B3029; --yolk:#E9B949; --yolk-ink:#2E2200; --yolk-soft:#3A3320;
+  --ticket:#22201A; --alert:#E77B69; --alert-ink:#2A0D08; color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{direction:rtl;scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:18px;line-height:1.65;-webkit-font-smoothing:antialiased}
+.page{max-width:1120px;margin:0 auto;padding-inline:20px}
+a{color:var(--teal)}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--yolk);outline-offset:2px}
+h1,h2,h3{font-family:var(--display);font-weight:400;line-height:1.15;text-wrap:balance;margin:0}
+p{margin:0}
+
+/* top bar */
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-block:18px}
+.mark{display:flex;align-items:center;gap:10px;font-family:var(--display);font-size:1.6rem;color:var(--ink);text-decoration:none}
+.mark svg{width:30px;height:30px;color:var(--teal)}
+.nav{display:flex;gap:22px;margin-inline-start:auto;margin-inline-end:10px}
+.nav a{color:var(--muted);text-decoration:none;font-weight:600;font-size:.95rem}
+.nav a:hover{color:var(--teal)}
+.top .cta{font-weight:700;font-size:.95rem;padding:9px 16px;border-radius:999px;background:var(--teal);color:var(--teal-ink);text-decoration:none;white-space:nowrap}
+
+/* hero */
+.hero{display:grid;grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);gap:44px;align-items:center;padding-block:26px 60px}
+.hero h1{font-size:clamp(2.2rem,4.9vw,3.5rem)}
+.hero .sub{font-size:1.16rem;color:var(--muted);margin-top:18px;max-width:31em}
+.hero .row{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px}
+.btn{display:inline-block;font-weight:700;padding:13px 22px;border-radius:999px;text-decoration:none;border:2px solid var(--teal)}
+.btn.solid{background:var(--teal);color:var(--teal-ink)}
+.btn.ghost{color:var(--teal);background:transparent}
+.facts{display:flex;flex-wrap:wrap;gap:8px 18px;margin:22px 0 0;padding:0;list-style:none;font-size:.92rem;font-weight:600}
+.facts li{display:flex;align-items:center;gap:7px}
+.facts li::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--teal)}
+.hint{margin-top:16px;font-size:.92rem;color:var(--muted)}
+
+/* demo stage */
+.stage{display:grid;grid-template-columns:minmax(0,250px) minmax(0,1fr);gap:22px;align-items:start;background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:22px}
+.cap{font-size:.78rem;font-weight:700;letter-spacing:.06em;color:var(--muted);margin-bottom:8px}
+.phone{background:var(--ink);border-radius:30px;padding:10px;max-width:250px}
+.screen{background:var(--bg);border-radius:22px;padding:16px 12px 14px;min-height:402px;position:relative;overflow:hidden}
+.venue{text-align:center;margin-bottom:10px}
+.venue b{display:block;font-family:var(--display);font-size:1.25rem;font-weight:400}
+.venue span{font-size:.82rem;color:var(--muted)}
+.status{display:flex;align-items:center;gap:8px;background:var(--teal-soft);color:var(--teal);border-radius:12px;padding:8px 10px;margin-bottom:10px;font-size:.84rem;font-weight:700;line-height:1.3}
+.status::before{content:"";flex:none;width:8px;height:8px;border-radius:50%;background:currentColor}
+.status.new{background:var(--yolk-soft);color:var(--ink)}
+.status.new::before{background:var(--yolk)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tap{border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:14px;padding:12px 6px;font-weight:700;font-size:.88rem;line-height:1.2;min-height:56px}
+.tap.act{border-color:var(--teal);color:var(--teal)}
+.tap.warn{border-color:var(--alert);color:var(--alert)}
+.tap:active{transform:scale(.97)}
+.fair{font-size:.72rem;color:var(--muted);text-align:center;margin-top:10px;line-height:1.35}
+.toast{position:absolute;inset-inline:12px;bottom:12px;background:var(--ink);color:var(--bg);font-size:.85rem;padding:9px 12px;border-radius:12px;text-align:center;line-height:1.35}
+.sheet{position:absolute;inset:0;background:var(--surface);padding:16px 12px;display:flex;flex-direction:column;gap:8px}
+.sheet b{font-size:1rem}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1.5px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:6px 10px;font-size:.85rem}
+.chip[aria-pressed="true"]{border-color:var(--alert);color:var(--alert);background:var(--surface)}
+.sheet .note{font-size:.72rem;color:var(--muted);line-height:1.35}
+.sheet .send{margin-top:auto;background:var(--alert);color:var(--alert-ink);border:0;border-radius:12px;padding:11px;font-weight:700}
+.sheet .x{background:none;border:0;color:var(--muted);font-size:.85rem}
+
+.rail{min-width:0}
+.rail-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.live{font-size:.78rem;font-weight:700;color:var(--teal);display:flex;align-items:center;gap:6px}
+.live i{width:8px;height:8px;border-radius:50%;background:var(--teal);display:inline-block;animation:blink 2s ease-in-out infinite}
+@keyframes blink{50%{opacity:.25}}
+.tickets{display:flex;flex-direction:column;gap:10px;min-height:150px}
+.ticket{background:var(--ticket);border:1px solid var(--line);border-radius:4px;padding:12px 14px 18px;font-family:var(--mono);font-size:.86rem;position:relative;
+  -webkit-mask:radial-gradient(circle 5px at 50% 100%,transparent 98%,#000) 0 0/12px 100% repeat-x;mask:radial-gradient(circle 5px at 50% 100%,transparent 98%,#000) 0 0/12px 100% repeat-x}
+.ticket .t1{display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:700;font-family:var(--body);font-size:1rem}
+.ticket .tbl{font-family:var(--display);font-weight:400;font-size:1.25rem}
+.ticket .msg{margin-top:4px;font-family:var(--body);font-size:.95rem}
+.ticket .meta{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px 10px;margin-top:8px;color:var(--muted);font-size:.78rem;font-variant-numeric:tabular-nums}
+.ticket .acts{display:flex;gap:6px}
+.pill{font-family:var(--body);font-size:.75rem;font-weight:700;padding:2px 9px;border-radius:999px;white-space:nowrap}
+.pill.new{background:var(--yolk);color:var(--yolk-ink)}
+.pill.call{background:var(--teal-soft);color:var(--teal)}
+.pill.issue{background:var(--alert);color:var(--alert-ink)}
+.mini{font-family:var(--body);font-size:.78rem;font-weight:700;border:1.5px solid var(--teal);background:transparent;color:var(--teal);border-radius:999px;padding:3px 11px}
+.mini.solid{background:var(--teal);color:var(--teal-ink)}
+.ticket.done{opacity:.6}
+.count{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:14px}
+.count div{background:var(--bg);border-radius:10px;padding:8px 10px}
+.count b{display:block;font-family:var(--display);font-weight:400;font-size:1.3rem}
+.count span{font-size:.74rem;color:var(--muted);line-height:1.25;display:block}
+@keyframes print{from{transform:translateY(-14px);opacity:0}to{transform:none;opacity:1}}
+.ticket.in{animation:print .35s ease-out}
+@media (prefers-reduced-motion:reduce){.ticket.in{animation:none}.live i{animation:none}}
+
+/* sections */
+section{padding-block:60px;border-top:1px solid var(--line)}
+section h2{font-size:clamp(1.8rem,3.4vw,2.45rem)}
+section .lead{color:var(--muted);margin-top:10px;max-width:38em}
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px;margin:30px 0 0;padding:0;counter-reset:s}
+.steps li{list-style:none;counter-increment:s}
+.steps li::before{content:counter(s);display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:var(--yolk);color:var(--yolk-ink);font-family:var(--display);font-size:1.25rem;margin-bottom:12px}
+.steps h3{font-size:1.3rem;margin-bottom:6px}
+.steps p{color:var(--muted)}
+
+/* monthly report */
+.report{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,390px);gap:48px;align-items:start}
+.uses{margin:24px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:16px}
+.uses li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px}
+.uses svg{width:24px;height:24px;margin-top:4px;color:var(--teal)}
+.uses b{display:block}
+.uses span{color:var(--muted);font-size:.97rem}
+.receipt{margin:0;background:var(--ticket);border:1px solid var(--line);border-radius:4px;padding:22px 22px 34px;font-family:var(--mono);font-size:.88rem;line-height:1.5;
+  -webkit-mask:radial-gradient(circle 6px at 50% 100%,transparent 98%,#000) 0 0/14px 100% repeat-x;mask:radial-gradient(circle 6px at 50% 100%,transparent 98%,#000) 0 0/14px 100% repeat-x}
+.receipt header{text-align:center;padding-bottom:12px;margin-bottom:12px;border-bottom:1.5px dashed var(--line)}
+.receipt header b{display:block;font-family:var(--display);font-weight:400;font-size:1.4rem;line-height:1.2}
+.receipt header span{color:var(--muted);font-size:.8rem}
+.receipt dl{margin:0;display:flex;flex-direction:column;gap:7px}
+.receipt dl div{display:flex;align-items:baseline;gap:8px}
+.receipt dt{flex:1;display:flex;align-items:baseline;gap:8px;min-width:0}
+.receipt dt::after{content:"";flex:1;min-width:12px;border-bottom:1.5px dotted var(--muted);opacity:.55;transform:translateY(-3px)}
+.receipt dd{margin:0;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.receipt hr{border:0;border-top:1.5px dashed var(--line);margin:6px 0}
+.receipt .flag dd{color:var(--alert)}
+.receipt figcaption{margin-top:14px;font-family:var(--body);font-size:.8rem;color:var(--muted);text-align:center}
+
+.gets{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 40px;margin:26px 0 0;padding:0}
+.gets li{list-style:none;display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px}
+.gets svg{width:24px;height:24px;margin-top:4px;color:var(--teal)}
+.gets b{display:block}
+.gets span{color:var(--muted);font-size:.97rem}
+
+/* plans */
+.plans{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:30px}
+.plan{background:var(--surface);border:1.5px solid var(--line);border-radius:20px;padding:24px;display:flex;flex-direction:column;gap:14px}
+.plan.main{border-color:var(--teal)}
+.plan .head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.plan h3{font-size:1.5rem}
+.plan .for{color:var(--muted);font-size:.97rem}
+.price{display:flex;flex-direction:column;gap:2px}
+.price b{font-family:var(--display);font-weight:400;font-size:2.05rem;line-height:1.1}
+.price span{color:var(--muted);font-size:.92rem}
+.plan ul{margin:0;padding-inline-start:1.2em;display:flex;flex-direction:column;gap:4px}
+.tagline{font-size:.78rem;font-weight:700;background:var(--teal-soft);color:var(--teal);padding:3px 10px;border-radius:999px}
+s.was{color:var(--muted);font-size:.6em;text-decoration-thickness:2px}
+
+.calc{margin-top:22px;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:22px;display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.6fr);gap:26px;align-items:center}
+.calc label{font-weight:700;display:block;margin-bottom:8px}
+.calc input[type=range]{width:100%;accent-color:var(--teal)}
+.tables{font-family:var(--display);font-size:2.6rem;line-height:1}
+.tables small{font-family:var(--body);font-size:1rem;color:var(--muted);margin-inline-start:6px}
+.res{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.res div{background:var(--bg);border-radius:12px;padding:12px}
+.res b{display:block;font-family:var(--display);font-weight:400;font-size:1.4rem;line-height:1.25}
+.res span{font-size:.8rem;color:var(--muted);line-height:1.3;display:block;margin-top:2px}
+.res s{font-size:inherit}
+.small{font-size:.9rem;color:var(--muted);margin-top:12px}
+.offer{margin-top:18px;background:var(--yolk-soft);border-radius:14px;padding:16px 20px;display:flex;flex-direction:column;gap:6px}
+.offer ul{margin:0;padding-inline-start:1.2em}
+
+/* rules + faq */
+.rules{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px;margin-top:26px}
+.rules h3{font-family:var(--body);font-weight:800;font-size:1.05rem;margin-bottom:6px;line-height:1.35}
+.rules p{color:var(--muted);font-size:.97rem}
+.faq{margin-top:22px}
+details{border-bottom:1px solid var(--line);padding-block:14px}
+details:first-of-type{border-top:1px solid var(--line)}
+summary{font-weight:700;cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:12px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";color:var(--teal);font-size:1.3rem;line-height:1}
+details[open] summary::after{content:"–"}
+details p{color:var(--muted);margin-top:8px;max-width:44em}
+
+.contact{background:var(--teal);color:var(--teal-ink);border-radius:24px;padding:36px 28px;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:24px;align-items:center;margin-block:60px}
+.contact h2{color:var(--teal-ink)}
+.contact p{opacity:.88;margin-top:8px}
+.phonebox{background:var(--surface);color:var(--ink);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:10px}
+.phonebox span{font-weight:600;color:var(--muted);font-size:.92rem}
+.num{font-family:var(--display);font-size:1.7rem;direction:ltr;text-align:right;user-select:all}
+.pbtns{display:flex;flex-wrap:wrap;gap:8px}
+.wa{font-weight:700;font-size:.92rem;padding:8px 16px;border-radius:999px;background:var(--teal);color:var(--teal-ink);text-decoration:none}
+.copy{border:1.5px solid var(--teal);background:transparent;color:var(--teal);border-radius:999px;padding:6px 14px;font-weight:700;font-size:.92rem}
+footer{padding-block:20px 40px;color:var(--muted);font-size:.85rem;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+
+@media (max-width:980px){
+  .hero{grid-template-columns:1fr}
+  .report,.contact{grid-template-columns:1fr}
+  .report .receipt{max-width:420px}
+  .calc{grid-template-columns:1fr}
+  .rules{grid-template-columns:1fr;gap:18px}
+}
+@media (max-width:760px){
+  .nav{display:none}
+  .res{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:640px){
+  .page{padding-inline:16px}
+  body{font-size:17px}
+  .stage{grid-template-columns:1fr;padding:16px}
+  .phone{margin-inline:auto}
+  .steps,.gets,.plans{grid-template-columns:1fr}
+  .top .cta{padding:8px 13px}
+  section{padding-block:48px}
+}
+</style>
+
+<div class="page" dir="rtl" lang="he">
+  <header class="top">
+    <a class="mark" href="#">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M12 11q5 5 0 10M16.5 8q8 8 0 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+      קרוב
+    </a>
+    <nav class="nav" aria-label="ניווט">
+      <a href="#how">איך זה עובד</a>
+      <a href="#report">הסיכום החודשי</a>
+      <a href="#plans">מחירים</a>
+      <a href="#faq">שאלות</a>
+    </nav>
+    <a class="cta" href="#contact">לתיאום הדגמה</a>
+  </header>
+
+  <main>
+    <div class="hero">
+      <div>
+        <h1>תדעו שמשהו לא בסדר בשולחן 7, כשהלקוח עוד יושב שם.</h1>
+        <p class="sub">סטנד בלוגו ובצבעים שלכם על כל שולחן. בהצמדת טלפון הלקוח פותח תפריט, קורא למלצר, מבקש חשבון או משאיר ביקורת. ואם משהו לא בסדר, ההודעה מגיעה אליכם עם מספר השולחן, בזמן שעוד אפשר לתקן.</p>
+        <div class="row">
+          <a class="btn solid" href="#contact">חודש ניסיון חינם</a>
+          <a class="btn ghost" href="#plans">כמה זה עולה</a>
+        </div>
+        <ul class="facts">
+          <li>בלי אפליקציה ללקוחות</li>
+          <li>NFC וגם QR בכל סטנד</li>
+          <li>בלי התחייבות</li>
+        </ul>
+        <p class="hint">נסו בעצמכם: לחצו על כפתור בטלפון של הלקוח, ואז על "בדרך" בטלפון של בעל הבית.</p>
+      </div>
+
+      <div class="stage" aria-label="הדמיה: הטלפון של הלקוח והטלפון של בעל הבית">
+        <div>
+          <div class="cap">הטלפון של הלקוח</div>
+          <div class="phone">
+            <div class="screen" id="screen">
+              <div class="venue"><b>קפה השכונה</b><span>שולחן 7</span></div>
+              <div class="status" id="status" role="status" hidden></div>
+              <div class="grid2">
+                <button class="tap act" type="button" data-act="call">קריאה למלצר</button>
+                <button class="tap act" type="button" data-act="bill">בקשת חשבון</button>
+                <button class="tap warn" type="button" id="issueBtn">משהו לא בסדר?</button>
+                <button class="tap" type="button" data-info="נפתח דף הביקורות של קפה השכונה בגוגל">דרגו אותנו בגוגל</button>
+                <button class="tap" type="button" data-info="נפתח התפריט של קפה השכונה">תפריט</button>
+                <button class="tap" type="button" data-info="הרשת: Shchuna_Guests · הסיסמה הועתקה">וויפיי</button>
+              </div>
+              <p class="fair">כל הכפתורים מוצגים לכל לקוח, בלי שאלה מקדימה.</p>
+              <div class="sheet" id="sheet" hidden>
+                <b>מה לא בסדר?</b>
+                <div class="chips" id="chips">
+                  <button class="chip" type="button" aria-pressed="false">הגיע קר</button>
+                  <button class="chip" type="button" aria-pressed="false">מחכים הרבה זמן</button>
+                  <button class="chip" type="button" aria-pressed="false">טעות בהזמנה</button>
+                  <button class="chip" type="button" aria-pressed="false">השולחן לא נקי</button>
+                </div>
+                <p class="note">ההודעה מגיעה רק לצוות. לא נאסף שום פרט מזהה.</p>
+                <button class="send" type="button" id="sendIssue">שליחה לצוות</button>
+                <button class="x" type="button" id="closeSheet">ביטול</button>
+              </div>
+              <div class="toast" id="toast" role="status" hidden></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="rail">
+          <div class="rail-head">
+            <div class="cap">הטלפון של בעל הבית</div>
+            <div class="live"><i></i>בזמן אמת</div>
+          </div>
+          <div class="tickets" id="tickets" aria-live="polite">
+            <article class="ticket">
+              <div class="t1"><span class="tbl">שולחן 11</span><span class="pill issue">משהו לא בסדר</span></div>
+              <div class="msg">"מחכים הרבה זמן"</div>
+              <div class="meta"><span>לפני 0:40 · <span class="pill new">חדש</span></span></div>
+            </article>
+            <article class="ticket done">
+              <div class="t1"><span class="tbl">שולחן 3</span><span class="pill call">בקשת חשבון</span></div>
+              <div class="meta"><span>טופל תוך 1:52</span></div>
+            </article>
+          </div>
+          <div class="count">
+            <div><b id="cToday">4</b><span>פניות היום</span></div>
+            <div><b id="cResp">1:52</b><span>זמן תגובה ממוצע</span></div>
+            <div><b id="cScans">142</b><span>סריקות השבוע</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section id="how">
+      <h2>איך זה עובד</h2>
+      <ol class="steps">
+        <li><h3>מתקינים אצלכם</h3><p>אני מגיע עם סטנד בלוגו ובצבעים שלכם לכל שולחן, מחבר אותו לתפריט, לוויפיי ולדף הגוגל שלכם, ובודק כל סטנד באייפון ובאנדרואיד.</p></li>
+        <li><h3>הלקוח מצמיד או סורק</h3><p>בלי אפליקציה ובלי הרשמה. מי שהטלפון שלו בלי NFC סורק את קוד ה-QR שעל הסטנד, ונפתח אותו דף.</p></li>
+        <li><h3>אתם יודעים מה קורה</h3><p>קריאות, בקשות חשבון ודיווחים מגיעים לטלפון או לטאבלט ליד הבר, עם מספר השולחן. בסוף החודש מגיע סיכום.</p></li>
+      </ol>
+    </section>
+
+    <section id="report">
+      <div class="report">
+        <div>
+          <h2>בסוף החודש יודעים מה קרה בכל שולחן</h2>
+          <p class="lead">כמה זמן לוקח לצוות להגיע לקריאה? רוב בעלי בתי הקפה לא מכירים את המספר הזה היום. בסיכום החודשי הוא מגיע אליכם, יחד עם כל מה שקרה בשולחנות.</p>
+          <ul class="uses">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><div><b>זמן תגובה, לפי שעה</b><span>רואים באיזו שעה הצוות לא מספיק, ומחליטים איפה לתגבר.</span></div></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><div><b>סריקות לפי שולחן</b><span>שולחן שכמעט לא סורקים בו? כנראה שהסטנד עומד במקום לא טוב.</span></div></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3l9 16H3z"/><path d="M12 10v4M12 17h.01"/></svg><div><b>מה חוזר ב"משהו לא בסדר"</b><span>כשאותה תלונה חוזרת, מתקנים את הסיבה ולא רק את המקרה.</span></div></li>
+          </ul>
+        </div>
+        <figure class="receipt" aria-label="דוגמה לסיכום חודשי">
+          <header><b>קפה השכונה</b><span>סיכום ספטמבר · 12 שולחנות</span></header>
+          <dl>
+            <div><dt>סריקות</dt><dd>386</dd></div>
+            <div><dt>שעת השיא</dt><dd>13:00-14:00</dd></div>
+            <div><dt>השולחן הכי פעיל</dt><dd>9 · 58 סריקות</dd></div>
+            <hr>
+            <div><dt>קריאות למלצר</dt><dd>34</dd></div>
+            <div><dt>בקשות חשבון</dt><dd>22</dd></div>
+            <div><dt>"משהו לא בסדר"</dt><dd>5 · כולן טופלו</dd></div>
+            <div><dt>זמן תגובה ממוצע</dt><dd>1:48 דק׳</dd></div>
+            <hr>
+            <div><dt>לחיצות על "דרגו אותנו"</dt><dd>41</dd></div>
+            <div class="flag"><dt>שולחן 4</dt><dd>3 סריקות · לבדוק מיקום</dd></div>
+          </dl>
+          <figcaption>דוגמה. אצלכם המספרים יגיעו מהשולחנות שלכם.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section>
+      <h2>מה מקבלים ביום ההתקנה</h2>
+      <p class="lead">במסלול מחובר, הכול מוכן לעבודה באותו יום.</p>
+      <ul class="gets">
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 21h14M8 21l4-17 4 17"/></svg><div><b>סטנד ממותג לכל שולחן</b><span>בצבעים שלכם, עם מספר שולחן, NFC ו-QR. לשולחנות בחוץ, מחומר שעומד בשמש.</span></div></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 7h16v12H4zM9 7V4h6v3"/></svg><div><b>2 סטנדים רזרביים</b><span>נשבר או נעלם? מניחים רזרבי, ואני מעדכן מרחוק לאיזה שולחן הוא שייך.</span></div></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 17V11a6 6 0 0 1 12 0v6l2 2H4zM10 21h4"/></svg><div><b>התראות לטלפון או לטאבלט</b><span>לכם או לאחראי המשמרת, עם מספר השולחן וזמן ההמתנה.</span></div></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><div><b>דשבורד וסיכום חודשי</b><span>סריקות לפי שולחן ושעה, פניות שטופלו וזמני תגובה.</span></div></li>
+      </ul>
+    </section>
+
+    <section id="plans">
+      <h2>שני מסלולים, ומשלמים לפי מספר השולחנות</h2>
+      <p class="lead">בית קפה עם 6 שולחנות לא צריך לשלם כמו מסעדה עם 25.</p>
+      <div class="plans">
+        <div class="plan">
+          <div class="head"><h3>תג</h3></div>
+          <p class="for">לעסק שרוצה רק תפריט או ביקורות בהצמדה.</p>
+          <div class="price"><b>59 ₪</b><span>לשולחן, תשלום חד פעמי</span></div>
+          <ul><li>סטנד ממותג עם NFC ו-QR</li><li>קישור לתפריט או לדף הביקורות</li><li>בלי מנוי חודשי</li><li>אפשר לשדרג למחובר בלי להחליף סטנדים</li></ul>
+        </div>
+        <div class="plan main">
+          <div class="head"><h3>מחובר</h3><span class="tagline">מומלץ</span></div>
+          <p class="for">לבית קפה שרוצה לדעת מה קורה בשולחנות, בזמן אמת.</p>
+          <div class="price"><b><s class="was">39 ₪</s> 29 ₪</b><span>לשולחן, חד פעמי · מחיר מייסדים</span></div>
+          <div class="price"><b>29 ₪ + 5 ₪ לשולחן</b><span>לחודש</span></div>
+          <ul><li>דף ממותג: תפריט, וויפיי, ביקורות</li><li>קריאה למלצר, בקשת חשבון ו"משהו לא בסדר"</li><li>התראות בזמן אמת, דשבורד וסיכום חודשי</li><li>החלפת סטנד שנשבר או נעלם, עד חמישית מהסטנדים בשנה</li><li>משנים תפריט וקישורים מתי שרוצים</li></ul>
+        </div>
+      </div>
+
+      <div class="calc">
+        <div>
+          <label for="nt">כמה שולחנות יש לכם?</label>
+          <div class="tables"><span id="ntOut">12</span><small>שולחנות</small></div>
+          <input id="nt" type="range" min="2" max="40" value="12" aria-describedby="ntOut">
+        </div>
+        <div>
+          <div class="res">
+            <div><b id="r1">348 ₪</b><span>מחובר, חד פעמי <s id="r1was">468 ₪</s></span></div>
+            <div><b id="r2">89 ₪</b><span>מחובר, לחודש</span></div>
+            <div><b id="r4">1,327 ₪</b><span>מחובר, שנה ראשונה עם חודש חינם</span></div>
+            <div><b id="r3">708 ₪</b><span>תג, חד פעמי</span></div>
+          </div>
+          <p class="small" id="perDay">המנוי יוצא כ-3 ₪ ביום. כוס קפה נוספת אחת ביום מכסה אותו.</p>
+        </div>
+      </div>
+      <div class="offer">
+        <b>מחיר מייסדים ל-10 בתי העסק הראשונים</b>
+        <ul><li>29 ₪ לשולחן במקום 39 ₪, במסלול מחובר</li><li>חודש ראשון חינם, בלי התחייבות</li></ul>
+      </div>
+    </section>
+
+    <section>
+      <h2>ביקורות אמיתיות, לפי הכללים של גוגל</h2>
+      <div class="rules">
+        <div><h3>כולם רואים את אותם כפתורים</h3><p>גוגל אוסרת לבקש ביקורות רק מלקוחות מרוצים, ועסק שעושה את זה מסתכן במחיקת ביקורות. אצלנו כפתור הביקורת מוצג לכל לקוח, בלי שאלה מקדימה ובלי מתנה או הנחה בתמורה.</p></div>
+        <div><h3>"משהו לא בסדר" לידו, לא במקומו</h3><p>הלקוח בוחר אם לכתוב ביקורת, לספר לצוות, או גם וגם. אתם מקבלים הזדמנות לתקן בזמן שהוא עוד יושב, ולקוח שטיפלו בו מהר זוכר את זה.</p></div>
+        <div><h3>בלי מכסות ובלי שמות של עובדים</h3><p>מאפריל 2026 גוגל אוסרת לקבוע לצוות מכסות ביקורות ולבקש מהלקוח להזכיר עובד בשמו. לכן אין בדף שאלה כמו "מי שירת אותך?".</p></div>
+      </div>
+    </section>
+
+    <section id="faq">
+      <h2>שאלות שבעלי בתי קפה שואלים</h2>
+      <div class="faq">
+        <details><summary>הלקוחות צריכים אפליקציה? ומה אם אין להם NFC?</summary><p>לא צריך אפליקציה. מצמידים טלפון לסטנד ונפתח דף רגיל בדפדפן, באייפון ובאנדרואיד. מי שהטלפון שלו בלי NFC סורק את קוד ה-QR שמודפס על הסטנד.</p></details>
+        <details><summary>מה קורה אם סטנד נגנב או נשבר?</summary><p>יש אצלכם 2 רזרביים. מניחים רזרבי על השולחן, ואני מעדכן מרחוק לאיזה שולחן הוא שייך. במסלול מחובר ההחלפות כלולות, עד חמישית מהסטנדים בשנה, ונשלחות אליכם בדואר.</p></details>
+        <details><summary>יש לי שולחנות מתכת. זה יעבוד?</summary><p>כן. הצ׳יפ נמצא בחלק העומד של הסטנד, מעל המשטח, ולכן המתכת לא מפריעה. בכל מקרה אני בודק על השולחנות שלכם לפני ההתקנה.</p></details>
+        <details><summary>ומה עם שולחנות בחוץ, בשמש?</summary><p>לשולחנות בחוץ אני מדפיס מ-ASA, חומר שעומד בשמש של קיץ ישראלי. פלסטיק רגיל מתחיל להתעקם כבר סביב 55 מעלות, ומשטח כהה בשמש מגיע ליותר מזה.</p></details>
+        <details><summary>הצוות שלי לא יספיק לענות לכל קריאה.</summary><p>בוחרים אילו כפתורים יופיעו. אפשר להתחיל רק עם "משהו לא בסדר", שמגיע לאחראי המשמרת, ולהוסיף קריאה למלצר ובקשת חשבון כשהצוות מוכן.</p></details>
+        <details><summary>מה עם הפרטיות של הלקוחות?</summary><p>לא אוספים שם, טלפון או כל פרט מזהה של הלקוחות. מה שלקוח כותב ב"משהו לא בסדר" מגיע רק אליכם, נשמר 90 יום ונמחק.</p></details>
+        <details><summary>למה לא מספיקה מדבקת QR רגילה?</summary><p>מדבקה מובילה לקישור אחד, ולא יודעת מאיזה שולחן סרקו. כאן כל סטנד יודע איזה שולחן הוא, הפניות מגיעות אליכם בזמן אמת, ואת התפריט והקישורים מחליפים בלי להדפיס מחדש.</p></details>
+        <details><summary>אפשר לעבור מתג למחובר אחר כך?</summary><p>כן, בלי להחליף סטנדים. משלמים רק את ההפרש ואת המנוי.</p></details>
+        <details><summary>יש התחייבות?</summary><p>לא. מבטלים את המנוי מתי שרוצים, והסטנדים נשארים אצלכם.</p></details>
+      </div>
+    </section>
+
+    <div class="contact" id="contact">
+      <div>
+        <h2>רוצים לראות את זה על השולחן שלכם?</h2>
+        <p>אני מגיע עם סטנד מוכן בלוגו שלכם ומראה את הלוח החי בפעולה. עשר דקות, בלי התחייבות.</p>
+      </div>
+      <div class="phonebox">
+        <span>אדם · טלפון ווטסאפ</span>
+        <div class="num" id="num">054-716-5300</div>
+        <div class="pbtns">
+          <a class="wa" href="https://wa.me/972547165300?text=%D7%94%D7%99%D7%99%20%D7%90%D7%93%D7%9D%2C%20%D7%A8%D7%90%D7%99%D7%AA%D7%99%20%D7%90%D7%AA%20%D7%94%D7%90%D7%AA%D7%A8%20%D7%A9%D7%9C%20%D7%A7%D7%A8%D7%95%D7%91%20%D7%95%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%AA%D7%90%D7%9D%20%D7%94%D7%93%D7%92%D7%9E%D7%94" target="_blank" rel="noopener">כתבו לי בווטסאפ</a>
+          <button class="copy" type="button" id="copy">העתקת המספר</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer><span>קרוב · סטנדים חכמים לבתי קפה ומסעדות</span><span>המחירים בשקלים, לפני מע״מ</span></footer>
+</div>
+
+<script>
+(function(){
+  const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
+  const KIND={call:'קריאה למלצר',bill:'בקשת חשבון',issue:'משהו לא בסדר'};
+  const ACK={call:'המלצר בדרך אליכם',bill:'החשבון בדרך אליכם',issue:'ראינו. מישהו מהצוות בדרך'};
+  const MY_TABLE=7, t0=Date.now();
+  let seq=0, today=4, scans=142, visited=false, toastT, statusT;
+  const resp=[112]; // seconds; the handled bill on table 3
+  const tickets=[
+    {id:++seq,table:11,kind:'issue',msg:'מחכים הרבה זמן',created:t0-40000,ack:0,done:0},
+    {id:++seq,table:3,kind:'bill',msg:'',created:t0-420000,ack:t0-308000,done:t0-240000}
+  ];
+  const mmss=sec=>{sec=Math.max(0,Math.round(sec));return Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0')};
+  const el=(tag,cls,text)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e};
+
+  function toast(t){const n=$('#toast');n.textContent=t;n.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>n.hidden=true,2200)}
+  function visit(){if(!visited){visited=true;scans++;$('#cScans').textContent=scans}}
+
+  function ticketEl(k,isNew){
+    const a=el('article','ticket'+(k.done?' done':'')+(isNew?' in':''));a.dataset.id=k.id;
+    const t1=el('div','t1');t1.append(el('span','tbl','שולחן '+k.table),el('span','pill '+(k.kind==='issue'?'issue':'call'),KIND[k.kind]));a.append(t1);
+    if(k.msg)a.append(el('div','msg','"'+k.msg+'"'));
+    const meta=el('div','meta');
+    if(k.done){meta.append(el('span',null,'טופל תוך '+mmss(((k.ack||k.done)-k.created)/1000)))}
+    else{
+      const left=el('span');left.append(el('span','age','לפני '+mmss((Date.now()-k.created)/1000)),document.createTextNode(' · '),el('span','pill '+(k.ack?'call':'new'),k.ack?'בדרך':'חדש'));
+      const acts=el('span','acts');
+      if(!k.ack){const b=el('button','mini','בדרך');b.type='button';b.dataset.do='ack';acts.append(b)}
+      const d=el('button','mini solid','טופל');d.type='button';d.dataset.do='done';acts.append(d);
+      meta.append(left,acts);
+    }
+    a.append(meta);return a;
+  }
+  function renderRail(newId){
+    const box=$('#tickets');box.textContent='';
+    tickets.slice().sort((x,y)=>y.created-x.created).slice(0,4).forEach(k=>box.append(ticketEl(k,k.id===newId)));
+    $('#cToday').textContent=today;
+    $('#cResp').textContent=mmss(resp.reduce((s,v)=>s+v,0)/resp.length);
+  }
+  function renderStatus(){
+    const st=$('#status');clearTimeout(statusT);
+    const mine=tickets.filter(k=>k.table===MY_TABLE).sort((x,y)=>y.created-x.created)[0];
+    if(!mine){st.hidden=true;return}
+    st.className='status'+(mine.ack||mine.done?'':' new');
+    st.textContent=mine.done?'טופל. תודה!':mine.ack?ACK[mine.kind]:'נשלח לצוות · '+KIND[mine.kind];
+    st.hidden=false;
+    if(mine.done)statusT=setTimeout(()=>st.hidden=true,3500);
+  }
+  function addTicket(kind,msg){
+    const open=tickets.find(k=>k.table===MY_TABLE&&k.kind===kind&&!k.done);
+    if(open){toast('הבקשה כבר אצל הצוות');return false}
+    const k={id:++seq,table:MY_TABLE,kind,msg:msg||'',created:Date.now(),ack:0,done:0};
+    tickets.push(k);today++;renderRail(k.id);renderStatus();return true;
+  }
+  $('#tickets').addEventListener('click',e=>{
+    const b=e.target.closest('button[data-do]');if(!b)return;
+    const k=tickets.find(x=>x.id===+b.closest('.ticket').dataset.id);if(!k||k.done)return;
+    const now=Date.now();
+    if(!k.ack&&!k.done)resp.push((now-k.created)/1000);
+    if(b.dataset.do==='ack')k.ack=now;else{k.done=now;if(!k.ack)k.ack=now}
+    renderRail();renderStatus();
+  });
+  setInterval(()=>{$$('#tickets .ticket').forEach(a=>{const k=tickets.find(x=>x.id===+a.dataset.id);const age=a.querySelector('.age');if(k&&age&&!k.done)age.textContent='לפני '+mmss((Date.now()-k.created)/1000)})},1000);
+
+  $$('[data-act]').forEach(b=>b.addEventListener('click',()=>{visit();if(addTicket(b.dataset.act))toast('נשלח לצוות')}));
+  $$('[data-info]').forEach(b=>b.addEventListener('click',()=>{visit();toast(b.dataset.info)}));
+  const sheet=$('#sheet'), chips=$$('#chips .chip');
+  $('#issueBtn').addEventListener('click',()=>{visit();sheet.hidden=false;chips[0].focus()});
+  $('#closeSheet').addEventListener('click',()=>{sheet.hidden=true;$('#issueBtn').focus()});
+  chips.forEach(c=>c.addEventListener('click',()=>{chips.forEach(o=>o.setAttribute('aria-pressed',String(o===c&&o.getAttribute('aria-pressed')!=='true')))}));
+  $('#sendIssue').addEventListener('click',()=>{
+    const sel=chips.find(c=>c.getAttribute('aria-pressed')==='true');
+    sheet.hidden=true;chips.forEach(o=>o.setAttribute('aria-pressed','false'));
+    if(addTicket('issue',sel?sel.textContent:''))toast('תודה. הצוות קיבל את ההודעה');
+  });
+  renderRail();
+
+  // calculator
+  const nt=$('#nt'), fmt=n=>n.toLocaleString('he-IL')+' ₪';
+  function calc(){
+    const n=+nt.value, once=29*n, month=29+5*n, perDay=month/30;
+    $('#ntOut').textContent=n;
+    $('#r1').textContent=fmt(once);$('#r1was').textContent=fmt(39*n);
+    $('#r2').textContent=fmt(month);$('#r4').textContent=fmt(once+11*month);$('#r3').textContent=fmt(59*n);
+    const d=perDay<10?(Math.round(perDay*10)/10).toLocaleString('he-IL'):Math.round(perDay).toLocaleString('he-IL');
+    $('#perDay').textContent='המנוי יוצא כ-'+d+' ₪ ביום. כוס קפה נוספת אחת ביום מכסה אותו.';
+  }
+  nt.addEventListener('input',calc);calc();
+
+  $('#copy').addEventListener('click',()=>{
+    const t=$('#num').textContent, btn=$('#copy');
+    const sel=()=>{const r=document.createRange();r.selectNodeContents($('#num'));const s=getSelection();s.removeAllRanges();s.addRange(r);btn.textContent='המספר מסומן, אפשר להעתיק'};
+    try{navigator.clipboard.writeText(t).then(()=>{btn.textContent='הועתק'},sel)}catch(e){sel()}
+  });
+})();
+</script>
