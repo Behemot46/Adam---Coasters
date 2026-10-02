@@ -373,8 +373,10 @@ table.data td.tn{font-family:var(--display);font-weight:700;font-size:1.4rem;lin
     </nav>
     <div class="conn" id="conn" role="status"><i></i><span>מתחבר…</span></div>
   </header>
+  <div class="banner" id="fatal" role="alert" hidden></div>
   <div class="banner" id="banner" hidden></div>
-  <main id="main"></main>
+  <noscript><div class="banner"><b>צריך JavaScript.</b><span>ההדגמה רצה בדפדפן, ולא בתצוגה מקדימה של קבצים. פתחו אותה ב-Chrome או ב-Safari, או דרך הקישור ב-Claude.</span></div></noscript>
+  <main id="main"><div class="d-skel">טוען את ההדגמה…</div></main>
 </div>
 <div id="solo" hidden></div>
 <div class="toast" id="toast" role="status" hidden></div>
@@ -382,6 +384,15 @@ table.data td.tn{font-family:var(--display);font-weight:700;font-size:1.4rem;lin
 <script>
 (() => {
 'use strict';
+/* if anything throws, say so on the page instead of leaving it looking dead */
+function showFatal(msg, line) {
+  const b = document.getElementById('fatal'); if (!b || !msg || msg === 'Script error.') return;
+  const t = document.createElement('b'), m = document.createElement('span');
+  t.textContent = 'משהו נשבר בדף.'; m.textContent = msg + (line ? ' (שורה ' + line + ')' : '') + ' · רעננו, ואם זה חוזר, שלחו צילום מסך.';
+  b.textContent = ''; b.append(t, m); b.hidden = false;
+}
+window.addEventListener('error', e => showFatal(e.message, e.lineno));
+window.addEventListener('unhandledrejection', e => showFatal(String((e.reason && e.reason.message) || e.reason || 'שגיאה')));
 const ARTIFACT_URL = 'https://claude.ai/artifact/RvmjBDBjpxq152qEX1nuqU';
 const DAY = 86400000, STALE_MS = 3 * 3600000, WINDOW_DAYS = 30;
 const KINDS = ['call', 'bill', 'issue'], REASONS = ['cold', 'wait', 'wrong', 'dirty', 'other'];
