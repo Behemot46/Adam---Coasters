@@ -2,6 +2,23 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Karantina:wght@400;700&family=Assistant:wght@400;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<script>
+/* ES5 only, so it still runs where the main script cannot (old engine, parse error) */
+(function () {
+  function show(msg) {
+    var b = document.getElementById('fatal');
+    if (!b || !msg || msg === 'Script error.') return;
+    b.textContent = '';
+    var t = document.createElement('b'), m = document.createElement('span');
+    t.appendChild(document.createTextNode('משהו נשבר בדף.'));
+    m.appendChild(document.createTextNode(msg + ' · רעננו, ואם זה חוזר, שלחו צילום מסך.'));
+    b.appendChild(t); b.appendChild(m); b.hidden = false;
+  }
+  window.addEventListener('error', function (e) { show((e.message || 'שגיאה') + (e.lineno ? ' (שורה ' + e.lineno + ')' : '')); });
+  window.addEventListener('unhandledrejection', function (e) { var r = e.reason; show(String((r && r.message) || r || 'שגיאה')); });
+  setTimeout(function () { var f = document.getElementById('fatal'); if (!window.__karovBooted && f && f.hidden) show('הקוד הראשי של ההדגמה לא הופעל (דפדפן ישן, או חסימת סקריפטים)'); }, 3000);
+})();
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 <style>
 /* Layout: one app, four views on hash anchors. Demo = diner phone beside the staff board; board = floor map + thermal tickets; report = filter row, stat tiles, charts, pilot gates; setup = form beside a live preview, then QR labels. #t7 / #q7 open a bare diner page. RTL. */
@@ -384,15 +401,7 @@ table.data td.tn{font-family:var(--display);font-weight:700;font-size:1.4rem;lin
 <script>
 (() => {
 'use strict';
-/* if anything throws, say so on the page instead of leaving it looking dead */
-function showFatal(msg, line) {
-  const b = document.getElementById('fatal'); if (!b || !msg || msg === 'Script error.') return;
-  const t = document.createElement('b'), m = document.createElement('span');
-  t.textContent = 'משהו נשבר בדף.'; m.textContent = msg + (line ? ' (שורה ' + line + ')' : '') + ' · רעננו, ואם זה חוזר, שלחו צילום מסך.';
-  b.textContent = ''; b.append(t, m); b.hidden = false;
-}
-window.addEventListener('error', e => showFatal(e.message, e.lineno));
-window.addEventListener('unhandledrejection', e => showFatal(String((e.reason && e.reason.message) || e.reason || 'שגיאה')));
+window.__karovBooted = true;
 const ARTIFACT_URL = 'https://claude.ai/artifact/RvmjBDBjpxq152qEX1nuqU';
 const DAY = 86400000, STALE_MS = 3 * 3600000, WINDOW_DAYS = 30;
 const KINDS = ['call', 'bill', 'issue'], REASONS = ['cold', 'wait', 'wrong', 'dirty', 'other'];
