@@ -574,24 +574,45 @@ function genSample(tables, seed) {
 
 /* ---------- stores ---------- */
 function LocalStore() {
-  const L = { venue: cleanVenue(DEFAULT_VENUE), reqs: new Map(), scans: new Map(), hist: genSample(12), subs: { venue: new Set(), reqs: new Set(), scans: new Set(), hist: new Set() } };
-  const emit = k => setTimeout(() => L.subs[k].forEach(f => f()), 0);
+  /* Used when there is no shared database: state lives in this browser (localStorage), and tabs of the same browser see each other's changes through the storage event. */
+  const KEY = 'karov-live-demo-v1', KEEP = 35 * DAY;
+  const subs = { venue: new Set(), reqs: new Set(), scans: new Set(), hist: new Set() };
+  let mem = null;
+  const fresh = () => ({ v: 1, venue: cleanVenue(DEFAULT_VENUE), reqs: {}, scans: {}, hist: genSample(12) });
+  function load() {
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (raw) { const o = JSON.parse(raw); if (o && o.v === 1 && o.reqs && o.scans) { mem = o; return o; } }
+    } catch (e) { /* storage blocked or corrupt: keep going in memory */ }
+    if (!mem) mem = fresh();
+    return mem;
+  }
+  function save(o) {
+    const cut = Date.now() - KEEP;
+    for (const k of Object.keys(o.reqs)) if (!(o.reqs[k].createdAt >= cut)) delete o.reqs[k];
+    for (const k of Object.keys(o.scans)) if (!(o.scans[k].at >= cut)) delete o.scans[k];
+    mem = o;
+    try { localStorage.setItem(KEY, JSON.stringify(o)); } catch (e) { /* full or blocked: memory only */ }
+  }
+  const emit = kinds => setTimeout(() => kinds.forEach(k => subs[k].forEach(f => f())), 0);
+  const sub = (k, f) => { subs[k].add(f); f(); return () => subs[k].delete(f); };
   const nid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
-  const sub = (k, f) => { L.subs[k].add(f); f(); return () => L.subs[k].delete(f); };
+  const rows = (map, key, since) => Object.keys(map).map(id => Object.assign({ id }, map[id])).filter(r => r[key] >= since);
+  window.addEventListener('storage', e => { if (e.key === KEY || e.key === null) emit(Object.keys(subs)); });
   return {
     mode: 'local',
-    onVenue: cb => sub('venue', () => cb(L.venue)),
-    saveVenue: d => { L.venue = JSON.parse(JSON.stringify(d)); emit('venue'); return Promise.resolve(); },
-    onRequests: (since, cb) => sub('reqs', () => cb([...L.reqs].map(([id, d]) => Object.assign({ id }, d)).filter(r => r.createdAt >= since))),
-    addRequest: d => { const id = nid(); L.reqs.set(id, Object.assign({}, d)); emit('reqs'); return Promise.resolve(id); },
-    updateRequest: (id, p) => { const d = L.reqs.get(id); if (d) { Object.assign(d, p); emit('reqs'); } return Promise.resolve(); },
-    onScans: (since, cb) => sub('scans', () => cb([...L.scans].map(([id, d]) => Object.assign({ id }, d)).filter(s => s.at >= since))),
-    addScan: d => { const id = nid(); L.scans.set(id, Object.assign({}, d)); emit('scans'); return Promise.resolve(id); },
-    updateScan: (id, p) => { const d = L.scans.get(id); if (d) { Object.assign(d, p); emit('scans'); } return Promise.resolve(); },
-    onHistory: cb => sub('hist', () => cb(L.hist)),
-    setHistory: d => { L.hist = d; emit('hist'); return Promise.resolve(); },
-    clearHistory: () => { L.hist = null; emit('hist'); return Promise.resolve(); },
-    resetLive: async () => { const n = L.reqs.size + L.scans.size; L.reqs.clear(); L.scans.clear(); emit('reqs'); emit('scans'); return n; }
+    onVenue: cb => sub('venue', () => cb(load().venue)),
+    saveVenue: d => { const o = load(); o.venue = JSON.parse(JSON.stringify(d)); save(o); emit(['venue']); return Promise.resolve(); },
+    onRequests: (since, cb) => sub('reqs', () => cb(rows(load().reqs, 'createdAt', since))),
+    addRequest: d => { const o = load(), id = nid(); o.reqs[id] = Object.assign({}, d); save(o); emit(['reqs']); return Promise.resolve(id); },
+    updateRequest: (id, p) => { const o = load(); if (o.reqs[id]) { Object.assign(o.reqs[id], p); save(o); emit(['reqs']); } return Promise.resolve(); },
+    onScans: (since, cb) => sub('scans', () => cb(rows(load().scans, 'at', since))),
+    addScan: d => { const o = load(), id = nid(); o.scans[id] = Object.assign({}, d); save(o); emit(['scans']); return Promise.resolve(id); },
+    updateScan: (id, p) => { const o = load(); if (o.scans[id]) { Object.assign(o.scans[id], p); save(o); emit(['scans']); } return Promise.resolve(); },
+    onHistory: cb => sub('hist', () => cb(load().hist)),
+    setHistory: d => { const o = load(); o.hist = d; save(o); emit(['hist']); return Promise.resolve(); },
+    clearHistory: () => { const o = load(); o.hist = null; save(o); emit(['hist']); return Promise.resolve(); },
+    resetLive: async () => { const o = load(), n = Object.keys(o.reqs).length + Object.keys(o.scans).length; o.reqs = {}; o.scans = {}; save(o); emit(['reqs', 'scans']); return n; }
   };
 }
 function LiveStore(db) {
@@ -1123,7 +1144,7 @@ function dataToolsHTML() {
     '<div class="datarow"><p><b>מההדגמה החיה:</b> ' + nReq + ' פניות ו-' + nScan + ' סריקות מ-30 הימים האחרונים. מחיקה מוחקת אותן מכל המכשירים.' + (S.busy ? ' <span class="note">' + esc(S.busy) + '</span>' : '') + '</p>' +
       (S.confirmReset ? '<span class="form-actions"><button type="button" class="btn danger solid" data-data="reset"' + (S.busy ? ' disabled' : '') + '>כן, למחוק הכול</button><button type="button" class="btn" data-data="cancelreset">ביטול</button></span>'
         : '<button type="button" class="btn danger" data-data="askreset"' + (ro || S.busy || !(nReq + nScan) ? ' disabled' : '') + '>מחיקת הפניות והסריקות</button>') + '</div>' +
-    '<div class="datarow"><p class="note">מי יכול לשלוח ולעדכן: בעלי הדף ומי שהוזמן אליו כעורך. מי שהוזמן מחוץ לארגון יכול לכתוב רק כל עוד הדף לא משותף בקישור ציבורי. מי שלא מחובר רואה את ההדגמה במצב מקומי, ומי שיש לו הרשאת צפייה בלבד רואה את הנתונים בלי לשנות אותם.</p></div>';
+    (S.mode === 'local' ? '<div class="datarow"><p class="note">מצב הדגמה מקומי: הנתונים נשמרים בדפדפן הזה בלבד. מחיקת נתוני האתר בדפדפן מוחקת אותם.</p></div>' : '<div class="datarow"><p class="note">מי יכול לשלוח ולעדכן: בעלי הדף ומי שהוזמן אליו כעורך. מי שהוזמן מחוץ לארגון יכול לכתוב רק כל עוד הדף לא משותף בקישור ציבורי. מי שלא מחובר רואה את ההדגמה במצב מקומי, ומי שיש לו הרשאת צפייה בלבד רואה את הנתונים בלי לשנות אותם.</p></div>');
 }
 function readForm() {
   const d = S.draft, f = id => $('#' + id);
@@ -1199,7 +1220,7 @@ function renderChrome() {
   const c = $('#conn'), map = { connecting: 'מתחבר…', live: 'מחובר · בזמן אמת', local: 'מצב מקומי', readonly: 'צפייה בלבד', offline: 'מנותק' };
   c.className = 'conn ' + S.mode; c.lastChild.textContent = map[S.mode];
   const b = $('#banner'), msg = {
-    local: '<b>מצב מקומי.</b><span>הלחיצות נשמרות רק בחלון הזה ולא עוברות בין מכשירים. כדי לעבוד מול בסיס הנתונים המשותף, פתחו את הדף כשאתם מחוברים לחשבון Claude עם הרשאת עריכה.</span>',
+    local: '<b>מצב הדגמה מקומי.</b><span>הנתונים נשמרים בדפדפן הזה בלבד, ומתעדכנים בין לשוניות פתוחות שלו. מכשיר אחר לא יראה אותם.</span>',
     readonly: '<b>צפייה בלבד.</b><span>רואים את הנתונים בזמן אמת, אבל אי אפשר לשלוח או לעדכן. כדי לקבל הרשאה, בקשו מבעלי הדף הזמנה כעורכים.</span>',
     offline: '<b>החיבור לבסיס הנתונים נותק.</b><span>רעננו את הדף כדי להתחבר מחדש.</span>'
   }[S.mode];
@@ -1217,15 +1238,20 @@ function render() {
   if (main.dataset.view !== S.view) { main.dataset.view = S.view; main.innerHTML = ''; hubDiner = null; delete main.dataset.setupSig; }
   if (S.view === 'demo') {
     if (!$('#hubPhone', main)) {
-      main.innerHTML = '<div class="view"><div class="intro"><div><h1>הדגמה <span class="tape">חיה</span>, מול בסיס נתונים אמיתי</h1><p>כל לחיצה בטלפון נשמרת בבסיס הנתונים של הדף, והלוח של הצוות קורא אותה בזמן אמת. פתחו את אותו קישור במכשיר נוסף, וכל לחיצה ועדכון יופיעו בשניהם.</p></div><div id="qrmini"></div></div>' +
+      main.innerHTML = '<div class="view"><div class="intro"><div><h1 id="introH"></h1><p id="introP"></p></div><div id="qrmini"></div></div>' +
         '<div class="hub"><div class="phonecol"><div class="seat"><span>הלקוח יושב בשולחן</span><button type="button" data-seat="-1" aria-label="שולחן קודם">−</button><b id="seatNum"></b><button type="button" data-seat="1" aria-label="שולחן הבא">+</button></div>' +
         '<div class="handset"><div class="screen"><div class="d-shell" id="hubPhone"><div class="d-skel">טוען את דף השולחן…</div></div></div></div><p class="caption">זה הדף שנפתח ללקוח כשהוא מצמיד את הטלפון לסטנד. נסו כפתור, ואז "בדרך" בלוח.</p></div>' +
         '<div id="hubBoard"></div></div></div>';
     }
     const v = venue(); S.hubTable = Math.min(S.hubTable, v.tables);
     $('#seatNum').textContent = S.hubTable;
+    const shared = S.mode !== 'local';
+    $('#introH').innerHTML = shared ? 'הדגמה <span class="tape">חיה</span>, מול בסיס נתונים אמיתי' : 'הדגמה <span class="tape">חיה</span>, בדפדפן שלכם';
+    $('#introP').textContent = shared
+      ? 'כל לחיצה בטלפון נשמרת בבסיס הנתונים של הדף, והלוח של הצוות קורא אותה בזמן אמת. פתחו את אותו קישור במכשיר נוסף, וכל לחיצה ועדכון יופיעו בשניהם.'
+      : 'כל לחיצה בטלפון נשמרת בדפדפן הזה, והלוח של הצוות קורא אותה מיד. פתחו את הדף בלשונית נוספת של אותו דפדפן, וכל לחיצה ועדכון יופיעו בשתי הלשוניות.';
     const qm = $('#qrmini');
-    if (qm && !qm.dataset.done && ARTIFACT_URL && typeof window.qrcode === 'function') { qm.dataset.done = '1'; qm.innerHTML = '<div class="qrmini">' + qrSvg(linkFor(7, 'qr'), 92) + '<span>סרקו מהטלפון כדי לשבת בשולחן 7. הלחיצות שלכם יופיעו בלוח כאן.</span></div>'; }
+    if (qm && !qm.dataset.done && S.mode === 'live' && ARTIFACT_URL && typeof window.qrcode === 'function') { qm.dataset.done = '1'; qm.innerHTML = '<div class="qrmini">' + qrSvg(linkFor(7, 'qr'), 92) + '<span>סרקו מהטלפון כדי לשבת בשולחן 7. הלחיצות שלכם יופיעו בלוח כאן.</span></div>'; }
     if (S.venueLoaded) {
       if (!hubDiner) hubDiner = makeDiner($('#hubPhone'), 'hub', S.hubTable, 'demo');
       hubDiner.table = S.hubTable; hubDiner.mount(false);
